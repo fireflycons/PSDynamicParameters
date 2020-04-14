@@ -108,15 +108,31 @@
                     dynamicParams.Add(new RuntimeDefinedParameterBuilder(Constants.DynamicParameterName).WithValidatePattern(Constants.IpAddressRegex));
                     break;
 
+                case TestCases.ValidatePatternWithRegexObject:
+
+                    dynamicParams.Add(new RuntimeDefinedParameterBuilder(Constants.DynamicParameterName).WithValidatePattern(new Regex(Constants.IpAddressRegex)));
+                    break;
+
                 case TestCases.ValidatePatterWithOptionsCaseSensitive:
 
                     // Uses default RegexOptions.None - which is case sensitive
                     dynamicParams.Add(new RuntimeDefinedParameterBuilder(Constants.DynamicParameterName).WithValidatePattern(Constants.CaseSensitivityRegex));
                     break;
 
+                case TestCases.ValidatePatterWithRegexObjectOptionsCaseSensitive:
+
+                    // Uses default RegexOptions.None - which is case sensitive
+                    dynamicParams.Add(new RuntimeDefinedParameterBuilder(Constants.DynamicParameterName).WithValidatePattern(new Regex(Constants.CaseSensitivityRegex)));
+                    break;
+
                 case TestCases.ValidatePatterWithOptionsCaseInsensitive:
 
                     dynamicParams.Add(new RuntimeDefinedParameterBuilder(Constants.DynamicParameterName).WithValidatePattern(Constants.CaseSensitivityRegex, RegexOptions.IgnoreCase));
+                    break;
+
+                case TestCases.ValidatePatternWithRegexObjectOptionsCaseInsensitive:
+
+                    dynamicParams.Add(new RuntimeDefinedParameterBuilder(Constants.DynamicParameterName).WithValidatePattern(new Regex(Constants.CaseSensitivityRegex, RegexOptions.IgnoreCase)));
                     break;
 
                 case TestCases.ValidateRangeWithMinMax:

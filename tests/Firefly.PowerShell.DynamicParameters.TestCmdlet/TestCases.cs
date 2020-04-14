@@ -1,6 +1,7 @@
 ﻿namespace Firefly.PowerShell.DynamicParameters.TestCmdlet
 {
     using System.Management.Automation;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// Describes the tests we are running. Used to influence how <see cref="ShowDynamicParameterCommand"/> builds the dynamic parameter.
@@ -68,14 +69,29 @@
         ValidatePatternViaArguments,
 
         /// <summary>
+        /// As <see cref="ValidatePatternViaArguments"/> but using a <see cref="Regex"/> object as the validation pattern
+        /// </summary>
+        ValidatePatternWithRegexObject,
+
+        /// <summary>
         /// Tests <see cref="ValidatePatternAttribute"/> with regex options case sensitive
         /// </summary>
         ValidatePatterWithOptionsCaseSensitive,
 
         /// <summary>
+        /// As <see cref="ValidatePatterWithOptionsCaseSensitive"/> but using a <see cref="Regex"/> object as the validation pattern
+        /// </summary>
+        ValidatePatterWithRegexObjectOptionsCaseSensitive,
+
+        /// <summary>
         /// Tests <see cref="ValidatePatternAttribute"/> with regex options case insensitive
         /// </summary>
         ValidatePatterWithOptionsCaseInsensitive,
+
+        /// <summary>
+        /// As <see cref="ValidatePatterWithOptionsCaseInsensitive"/> but using a <see cref="Regex"/> object as the validation pattern
+        /// </summary>
+        ValidatePatternWithRegexObjectOptionsCaseInsensitive,
 
         /// <summary>
         /// Tests <see cref="ValidatePatternAttribute"/> with argument from pipeline

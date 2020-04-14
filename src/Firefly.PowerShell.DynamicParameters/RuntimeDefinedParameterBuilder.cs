@@ -297,6 +297,18 @@
         }
 
         /// <summary>
+        /// Applies <see cref="ValidatePatternAttribute"/> with given <see cref="Regex"/>.
+        /// </summary>
+        /// <param name="regex">The regex to apply.</param>
+        /// <returns>This builder</returns>
+        public RuntimeDefinedParameterBuilder WithValidatePattern(
+            Regex regex)
+        {
+            this.attributesToApply.Add(new ValidatePatternAttribute(regex.ToString()) { Options = regex.Options });
+            return this;
+        }
+
+        /// <summary>
         /// <para>Applies <see cref="ValidateRangeAttribute"/> with custom range</para>
         /// <para>Ensures the parameter value is not less than <paramref name="minRange"/> and not greater than <paramref name="maxRange"/></para>
         /// </summary>
