@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Firefly.PowerShell.DynamicParameters.TestCmdlet": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "commandLineArgs": " -NoExit -Command \"Import-Module .\\Firefly.PowerShell.DynamicParameters.TestCmdlet.psd1 ; Show-DynamicParameter -TestNumber 1 -TestParameter 'a string'\""
+    }
+  }
+}

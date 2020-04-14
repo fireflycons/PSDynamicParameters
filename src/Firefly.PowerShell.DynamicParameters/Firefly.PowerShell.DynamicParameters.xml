@@ -1,0 +1,236 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Firefly.PowerShell.DynamicParameters</name>
+    </assembly>
+    <members>
+        <member name="T:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder">
+            <summary>
+            Builder class to generate a PowerShell dynamic parameter
+            </summary>
+        </member>
+        <member name="F:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.attributesToApply">
+            <summary>
+            The additional attributes to apply to the parameter
+            </summary>
+        </member>
+        <member name="F:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.parameterName">
+            <summary>
+            The parameter name
+            </summary>
+        </member>
+        <member name="F:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.parameterType">
+            <summary>
+            The parameter type
+            </summary>
+        </member>
+        <member name="F:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.mandatory">
+            <summary>
+            <c>true</c> if parameter will be mandatory; else <c>false</c>
+            </summary>
+        </member>
+        <member name="F:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.parameterHelpMessage">
+            <summary>
+            The parameter help message
+            </summary>
+        </member>
+        <member name="F:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.parameterParameterSetNames">
+            <summary>
+            The parameter parameter set name
+            </summary>
+        </member>
+        <member name="F:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.parameterPosition">
+            <summary>
+            The parameter position
+            </summary>
+        </member>
+        <member name="F:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.valueFromPipeline">
+            <summary>
+            <c>true</c> if parameter will take value from pipeline; else <c>false</c>
+            </summary>
+        </member>
+        <member name="F:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.valueFromPipelineByPropertyName">
+            <summary>
+            <c>true</c> if parameter will take value from pipeline by property name; else <c>false</c>
+            </summary>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder"/> class.
+            The parameter will have a default type of <see cref="T:System.Object"/>
+            </summary>
+            <param name="name">The parameter name.</param>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.#ctor(System.String,System.Type)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder"/> class.
+            </summary>
+            <param name="name">The parameter name.</param>
+            <param name="type">The parameter type.</param>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.#ctor">
+            <summary>
+            Prevents a default instance of the <see cref="T:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder"/> class from being created.
+            </summary>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.Build">
+            <summary>
+            Builds the parameter.
+            </summary>
+            <returns>A new <see cref="T:System.Management.Automation.RuntimeDefinedParameter"/></returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithAliases(System.String[])">
+            <summary>
+            Declares parameter aliases.
+            </summary>
+            <param name="aliases">The additional aliases.</param>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithAllowNull">
+            <summary>
+            Adds <see cref="T:System.Management.Automation.AllowNullAttribute"/>.
+            </summary>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithHelpMessage(System.String)">
+            <summary>
+            Declares a help message.
+            </summary>
+            <param name="helpMessage">The help message.</param>
+            <returns>This builder</returns>
+            <returns></returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithMandatory">
+            <summary>
+            Declares parameter mandatory.
+            </summary>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithParameterSets(System.String[])">
+            <summary>
+            Includes parameter in named parameter set.
+            </summary>
+            <param name="parameterSetNames">Name of the parameter set.</param>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithPosition(System.Int32)">
+            <summary>
+            Sets the parameter as positional and what position.
+            </summary>
+            <param name="position">The position.</param>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithValidateCount(System.Int32,System.Int32)">
+            <summary>
+            Applies <see cref="T:System.Management.Automation.ValidateCountAttribute"/>
+            </summary>
+            <param name="minLength">The minimum length.</param>
+            <param name="maxLength">The maximum length.</param>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithValidateLength(System.Int32,System.Int32)">
+            <summary>
+            Applies <see cref="T:System.Management.Automation.ValidateLengthAttribute"/>
+            </summary>
+            <param name="minLength">The minimum length.</param>
+            <param name="maxLength">The maximum length.</param>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithValidateNotNull">
+            <summary>
+            Applies <see cref="T:System.Management.Automation.ValidateNotNullOrEmptyAttribute"/>
+            </summary>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithValidateNotNullOrEmpty">
+            <summary>
+            Applies <see cref="T:System.Management.Automation.ValidateNotNullOrEmptyAttribute"/>
+            </summary>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithValidatePattern(System.String,System.Text.RegularExpressions.RegexOptions)">
+            <summary>
+            Sets a validation patterns.
+            </summary>
+            <param name="regexPattern">The regex pattern.</param>
+            <param name="options">Optional <see cref="T:System.Text.RegularExpressions.RegexOptions"/> to apply to regex pattern.</param>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithValidateRange(System.Object,System.Object)">
+            <summary>
+            Applies <see cref="T:System.Management.Automation.ValidateRangeAttribute"/> with custom range
+            </summary>
+            <param name="minRange">
+            The minimum bound.
+            </param>
+            <param name="maxRange">
+            The maximum bound.
+            </param>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithValidateScript(System.Management.Automation.ScriptBlock)">
+            <summary>
+            Applies the <see cref="T:System.Management.Automation.ValidateScriptAttribute"/>
+            </summary>
+            <param name="validateScript">The validate script.</param>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithValidateSet(System.String[])">
+            <summary>
+            Applies a validate set.
+            </summary>
+            <param name="validValues">The valid values.</param>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithValueFromPipeline">
+            <summary>
+            Declares parameter as able to take value from pipeline.
+            </summary>
+            <returns>This builder</returns>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder.WithValueFromPipelineByPropertyName">
+            <summary>
+            Declares parameter as able to take value from pipeline by property.
+            </summary>
+            <returns>This builder</returns>
+        </member>
+        <member name="T:Firefly.PowerShell.DynamicParameters.RuntimeDefinedParameterDictionaryHelper">
+            <summary>
+            Helper class to accumulate a <see cref="T:System.Management.Automation.RuntimeDefinedParameterDictionary"/> which is required in the <c>DynamicParameters</c> declaration of a Cmdlet
+            <seealso href="https://docs.microsoft.com/en-us/dotnet/api/system.management.automation.idynamicparameters.getdynamicparameters?view=pscore-6.2.0#System_Management_Automation_IDynamicParameters_GetDynamicParameters"/>
+            <seealso href="https://www.powershellmagazine.com/2014/06/23/dynamic-parameters-in-c-cmdlets/"/>
+            </summary>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.RuntimeDefinedParameterDictionaryHelper.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Firefly.PowerShell.DynamicParameters.RuntimeDefinedParameterDictionaryHelper"/> class with an empty parameter dictionary
+            </summary>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.RuntimeDefinedParameterDictionaryHelper.#ctor(System.Management.Automation.RuntimeDefinedParameterDictionary)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Firefly.PowerShell.DynamicParameters.RuntimeDefinedParameterDictionaryHelper"/> class from an existing <see cref="T:System.Management.Automation.RuntimeDefinedParameterDictionary"/>
+            </summary>
+            <param name="dict">The dictionary.</param>
+        </member>
+        <member name="P:Firefly.PowerShell.DynamicParameters.RuntimeDefinedParameterDictionaryHelper.DynamicParameters">
+            <summary>
+            Gets the current state of the contained <see cref="T:System.Management.Automation.RuntimeDefinedParameterDictionary"/>.
+            </summary>
+            <value>
+            The dynamic parameters.
+            </value>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.RuntimeDefinedParameterDictionaryHelper.Add(Firefly.PowerShell.DynamicParameters.DynamicParameterBuilder)">
+            <summary>
+            Adds a new dynamic parameter using the specified parameter builder.
+            </summary>
+            <param name="parameterBuilder">The parameter builder.</param>
+        </member>
+        <member name="M:Firefly.PowerShell.DynamicParameters.RuntimeDefinedParameterDictionaryHelper.Add(System.Management.Automation.RuntimeDefinedParameter)">
+            <summary>
+            Adds the specified dynamic parameter.
+            </summary>
+            <param name="parameter">The parameter.</param>
+        </member>
+    </members>
+</doc>
