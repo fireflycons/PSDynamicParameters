@@ -7,20 +7,16 @@ environment:
 image:
   - Visual Studio 2019
 
-for:
-- matrix:
-    only:
-      - image: Visual Studio 2019
-  install:
-    - cmd: cinst docfx -y
+install:
+  - cmd: cinst docfx -y
 
 # Skip on updates to the readme.
 # We can force this by adding [skip ci] or [ci skip] anywhere in commit message
 skip_commits:
   message: /NO_CI.*|updated readme.*|update readme.*s/
 
-matrix:
-  fast_finish: true
-
 build_script:
   - ps: .\build\build.ps1 -Target Build # -Verbosity Diagnostic -buildVerbosity=Verbose
+
+test_script:
+  - ps: .\build\build.ps1 -Target Test
