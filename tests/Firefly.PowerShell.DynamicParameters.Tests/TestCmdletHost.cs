@@ -109,20 +109,7 @@
         /// <summary>
         /// Path to PSD1 file describing the <see cref="ShowDynamicParameterCommand"/> cmdlet
         /// </summary>
-        private static readonly string CmdletModulePath;
-
-        /// <summary>
-        /// Initializes static members of the <see cref="TestCmdletHost"/> class.
-        /// </summary>
-        static TestCmdletHost()
-        {
-            var modulePath = typeof(ShowDynamicParameterCommand).Assembly.Location;
-
-            CmdletModulePath = Path.Combine(
-                // ReSharper disable once AssignNullToNotNullAttribute
-                Path.GetDirectoryName(modulePath),
-                Path.GetFileNameWithoutExtension(modulePath) + ".psd1");
-        }
+        private static readonly string CmdletModulePath = typeof(ShowDynamicParameterCommand).Assembly.Location;
 
         /// <summary>
         /// Runs the <see cref="ShowDynamicParameterCommand"/> with arguments for test and collects results

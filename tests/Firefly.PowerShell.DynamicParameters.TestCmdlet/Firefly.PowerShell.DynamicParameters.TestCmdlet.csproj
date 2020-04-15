@@ -22,9 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Firefly.PowerShell.DynamicParameters.TestCmdlet.psd1">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Firefly.PowerShell.DynamicParameters.TestCmdlet.psm1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
