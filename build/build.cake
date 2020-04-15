@@ -17,17 +17,23 @@ Task("Build")
 Task("Test")
     .Does(() => {
 
-        DotNetCoreTest("../tests/Firefly.PowerShell.DynamicParameters.Tests/Firefly.PowerShell.DynamicParameters.Tests.csproj", new DotNetCoreTestSettings
+        // ArgumentCustomization = args=>args.Append("-StorePasswordInClearText")
+        foreach (var fw in new [] { "net452", "netcoreapp2.1", "netcoreapp3.1"})
         {
-            Configuration = "Release",
-            Framework = "netcoreapp2.1"
-        });
+            var settings = new DotNetCoreTestSettings
+            {
+                Configuration = "Release",
+                NoBuild = true,
+                Framework = fw
+            };
 
-        DotNetCoreTest("../tests/Firefly.PowerShell.DynamicParameters.Tests/Firefly.PowerShell.DynamicParameters.Tests.csproj", new DotNetCoreTestSettings
-        {
-            Configuration = "Release",
-            Framework = "netcoreapp3.1"
-        });
+            if (isAppveyor)
+            {
+                settings.ArgumentCustomization = args => args.Append("-appveyor");
+            }
+
+            DotNetCoreTest("../tests/Firefly.PowerShell.DynamicParameters.Tests/Firefly.PowerShell.DynamicParameters.Tests.csproj", settings);
+        }
     });
 
 Task("BuildDocumentation")
