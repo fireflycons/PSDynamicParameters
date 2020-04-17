@@ -191,7 +191,13 @@
         }
 
         /// <summary>
+        /// <para>
         /// Declares a help message describing the parameter usage.
+        /// </para>
+        /// <para>
+        /// When the parameter is mandatory and not provided in interactive mode, the user is queried for the parameter value.
+        /// If "?" is entered, then this help message is displayed.
+        /// </para>
         /// </summary>
         /// <param name="helpMessage">The help message.</param>
         /// <returns>This builder</returns>
