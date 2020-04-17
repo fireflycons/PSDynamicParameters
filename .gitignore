@@ -263,6 +263,7 @@ __pycache__/
 # Cake
 build/tools/*
 !build/tools/packages.config
+tools/
 
 # Test results (Cake)
 test-output/

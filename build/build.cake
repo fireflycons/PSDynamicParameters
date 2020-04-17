@@ -1,6 +1,9 @@
 #addin nuget:?package=Cake.DocFx&version=0.13.1
+#addin nuget:?package=Newtonsoft.Json&version=12.0.3
 
 using System.Net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 var target = Argument("target", "Default");
 var isAppveyor = Environment.GetEnvironmentVariables().Keys.Cast<string>().Any(k => k.StartsWith("APPVEYOR_", StringComparison.OrdinalIgnoreCase));
@@ -56,8 +59,25 @@ Task("Test")
 Task("BuildDocumentation")
     .Does(() => {
 
-        DocFxBuild("../docfx/docfx.json", new DocFxBuildSettings {
-            Serve = false,
+        var config = File("../docfx/docfx.json");
+        string siteDir;
+
+        using (System.IO.StreamReader reader = System.IO.File.OpenText(config))
+        {
+            JObject o = (JObject)JToken.ReadFrom(new JsonTextReader(reader));
+
+            var site = o["build"]["dest"];
+
+            siteDir = ((FilePath)config).GetDirectory().Combine(Directory(site.ToString())).ToString();
+        }
+
+        if (DirectoryExists(siteDir))
+        {
+            System.IO.Directory.Delete(siteDir, true);
+        }
+
+        DocFxBuild(config, new DocFxBuildSettings {
+            Serve = true,
             Force = true
         });
     });
