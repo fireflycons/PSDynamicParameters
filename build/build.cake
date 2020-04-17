@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 var target = Argument("target", "Default");
+var serveDocs = Argument<bool>("serveDocs", false);
 var isAppveyor = Environment.GetEnvironmentVariables().Keys.Cast<string>().Any(k => k.StartsWith("APPVEYOR_", StringComparison.OrdinalIgnoreCase));
 var isReleasePublication = Environment.GetEnvironmentVariable("APPVEYOR_REPO_BRANCH") == "master" && Environment.GetEnvironmentVariable("APPVEYOR_REPO_TAG ") == "true";
 
@@ -77,7 +78,7 @@ Task("BuildDocumentation")
         }
 
         DocFxBuild(config, new DocFxBuildSettings {
-            Serve = true,
+            Serve = isAppveyor ? false : serveDocs,     // Never serve docs on Appveyor as it blocks
             Force = true
         });
     });
