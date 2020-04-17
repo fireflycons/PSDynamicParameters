@@ -16,7 +16,6 @@ skip_commits:
   message: /NO_CI.*|updated readme.*|update readme.*s/
 
 build_script:
-  - ps: .\build\build.ps1 -Target Build # -Verbosity Diagnostic -buildVerbosity=Verbose
+  - ps: .\build\build.ps1
 
-test_script:
-  - ps: .\build\build.ps1 -Target Test
+test: off
