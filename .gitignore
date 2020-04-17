@@ -264,6 +264,9 @@ __pycache__/
 build/tools/*
 !build/tools/packages.config
 
+# Test results (Cake)
+test-output/
+
 # Other stuff
 .vscode/
 **/StyleCop.Cache

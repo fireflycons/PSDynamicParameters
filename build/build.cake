@@ -1,5 +1,7 @@
 #addin nuget:?package=Cake.DocFx&version=0.13.1
 
+using System.Net;
+
 var target = Argument("target", "Default");
 var isAppveyor = Environment.GetEnvironmentVariables().Keys.Cast<string>().Any(k => k.StartsWith("APPVEYOR_", StringComparison.OrdinalIgnoreCase));
 var isReleasePublication = Environment.GetEnvironmentVariable("APPVEYOR_REPO_BRANCH") == "master" && Environment.GetEnvironmentVariable("APPVEYOR_REPO_TAG ") == "true";
@@ -14,25 +16,40 @@ Task("Build")
 
     });
 
+
 Task("Test")
     .Does(() => {
 
-        // ArgumentCustomization = args=>args.Append("-StorePasswordInClearText")
-        foreach (var fw in new [] { "net452", "netcoreapp2.1", "netcoreapp3.1"})
+        var resultsDir = Directory(System.IO.Path.Combine(EnvironmentVariableOrDefault("APPVEYOR_BUILD_FOLDER", ".."), "test-output"));
+        try
         {
-            var settings = new DotNetCoreTestSettings
+            // ArgumentCustomization = args=>args.Append("-StorePasswordInClearText")
+            foreach (var fw in new [] { "net452", "netcoreapp2.1", "netcoreapp3.1"})
             {
-                Configuration = "Release",
-                NoBuild = true,
-                Framework = fw
-            };
+                var settings = new DotNetCoreTestSettings
+                {
+                    Configuration = "Release",
+                    NoBuild = true,
+                    Framework = fw,
+                    Logger = "trx",
+                    ResultsDirectory = resultsDir
+                };
 
+                DotNetCoreTest("../tests/Firefly.PowerShell.DynamicParameters.Tests/Firefly.PowerShell.DynamicParameters.Tests.csproj", settings);
+            }
+        }
+        finally
+        {
             if (isAppveyor)
             {
-                settings.ArgumentCustomization = args => args.Append("-appveyor");
+                using (var wc = new WebClient())
+                {
+                    foreach(var result in GetFiles(resultsDir + File("*.trx")))
+                    {
+                        wc.UploadFile($"https://ci.appveyor.com/api/testresults/mstest/{EnvironmentVariableStrict("APPVEYOR_JOB_ID")}", result.ToString());
+                    }
+                }
             }
-
-            DotNetCoreTest("../tests/Firefly.PowerShell.DynamicParameters.Tests/Firefly.PowerShell.DynamicParameters.Tests.csproj", settings);
         }
     });
 
@@ -51,3 +68,21 @@ Task("Default")
     .IsDependentOn("BuildDocumentation");
 
 RunTarget(target);
+
+
+string EnvironmentVariableStrict(string name)
+{
+    var val = Environment.GetEnvironmentVariable(name);
+
+    if (string.IsNullOrEmpty(val))
+    {
+        throw new CakeException($"Variable '{name}' not found");
+    }
+
+    return val;
+}
+
+string EnvironmentVariableOrDefault(string name, string defaultValue)
+{
+    return Environment.GetEnvironmentVariable(name) ?? defaultValue;
+}
