@@ -5,5 +5,5 @@ if (-not $cinst)
     return
 }
 
-& $cinst docfx -y
+& $cinst docfx --yes --limit-output
 exit $LASTEXITCODE
