@@ -25,13 +25,16 @@ function Invoke-Git
             }
             else
             {
-                if ($OutputToPipeline)
+                if (-not ([string]::IsNullOrEmpty($_)))
                 {
-                    $_
-                }
-                else
-                {
-                    Write-Host $_
+                    if ($OutputToPipeline)
+                    {
+                        $_
+                    }
+                    else
+                    {
+                        Write-Host $_
+                    }
                 }
             }
         }
