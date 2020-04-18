@@ -28,6 +28,5 @@ Invoke-Git config --global user.email "${env:GITHUB_EMAIL}"
 Invoke-Git config --global user.name "AppVeyor"
 Push-Location $cloneFolder
 Invoke-Git clone https://github.com/fireflycons/fireflycons.github.io.git
-Get-ChildItem fireflycons.github.io
 Pop-Location
 
