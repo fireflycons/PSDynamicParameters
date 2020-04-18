@@ -21,7 +21,7 @@ function Invoke-Git
         ForEach-Object {
             if ($_ -is [System.Management.Automation.ErrorRecord])
             {
-                Write-Host $_.ErrorDetails.Message
+                Write-Host "Error: $($_.ErrorDetails.Message)"
             }
             else
             {
