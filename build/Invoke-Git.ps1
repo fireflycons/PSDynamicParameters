@@ -6,6 +6,8 @@ function Invoke-Git
     (
         [switch]$OutputToPipeline,
 
+        [switch]$SuppressWarnings,
+
         [Parameter(ValueFromRemainingArguments)]
         [string[]]$GitArgs
     )
@@ -21,6 +23,7 @@ function Invoke-Git
         ForEach-Object {
             if ($_ -is [System.Management.Automation.ErrorRecord])
             {
+                # Some git warnings still make it out as error records.
                 $msg = $(
                     if (-not ([string]::IsNullOrEmpty($_.ErrorDetails.Message)))
                     {
@@ -30,8 +33,12 @@ function Invoke-Git
                     {
                         $_.Exception.Message
                     }
-                )
-                Write-Host "Error: $msg"
+                ).Trim()
+
+                if (-not ($SuppressWarnings -and $msg -ilike 'warning*'))
+                {
+                    Write-Host $msg
+                }
             }
             else
             {

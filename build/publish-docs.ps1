@@ -21,7 +21,7 @@ Push-Location (Join-Path $env:APPVEYOR_BUILD_FOLDER "../fireflycons.github.io")
 try
 {
     # Stage any changes
-    Invoke-Git add --all
+    Invoke-Git -SuppressWarnings add --all
 
     # Check status
     $stat = Invoke-Git -OutputToPipeline status --short
