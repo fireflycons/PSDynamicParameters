@@ -1,21 +1,26 @@
 environment:
-  NuGetApiKey:
+  NUGET_API_KEY:
     secure: ZwF65Rl156oMAenHhi8BAY0LySWhhjDvNNt91dpU7D5N88E8ToZyZHCziktv7sz3
-  APPVEYOR_SSH_KEY: ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAnGF97nAjzT0pZn7JCrllP+2ao0k0hY9iAUH+kg8/gLrdEJhephXIynCjEuuSPeNB9XxSd1lwm8E80p55T0fYwuzP6LFX11GJVaIsnV4rH3SUFY//MuhILu7o2FxLINDT7Kjrc04VlNxQf6YDhYNeEcyJmK8JO/gVfZmfMuEPtbtbEw9v4v1qTJaotOlJ3gmaXg8kO580N5PYjKvqhirI1ygWe1HOyLny/k4xfKMCHlAvNxSIGXqJBU5OTwXvsXypgI0RQJw4DWv2XG3BSvJkvB/crdLBubZprWv+Q6RlyBzM8FysqXLxT289yGR7n57eq+NY3BSBLfdbYmSv15nFuQ==
-  DISABLE_LOCALSTACK: true
+  GITHUB_PAT:
+    secure: w8H/kYnxC0NVBLhm4uXSLNH110FtIAQ1COq0Wl5RgwDCG3apzXfSCEfJcwSc44QQ
+  GITHUB_EMAIL:
+    secure: CxOftS/5wmEkPCDl0O/KIiKlF4KhUnGD9436K/1iQwY3RkDMZRCkCEny+dG5zCS+
 
 image:
   - Visual Studio 2019
 
 install:
-  - cmd: cinst docfx -y
+  - ps: ./install/install.ps1
 
 # Skip on updates to the readme.
 # We can force this by adding [skip ci] or [ci skip] anywhere in commit message
 skip_commits:
   message: /NO_CI.*|updated readme.*|update readme.*s/
 
+before_build:
+  - ps: ./build/pre-build.ps1
+
 build_script:
-  - ps: .\build\build.ps1
+  - ps: ./build/build.ps1
 
 test: off
