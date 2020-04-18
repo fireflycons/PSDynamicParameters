@@ -24,3 +24,6 @@ build_script:
   - ps: ./build/build.ps1
 
 test: off
+
+on_success:
+  - ps: ./build/publish-docs

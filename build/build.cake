@@ -61,25 +61,35 @@ Task("BuildDocumentation")
     .Does(() => {
 
         var config = File("../docfx/docfx.json");
-        string siteDir;
+        DirectoryPath siteDir;
 
-        using (System.IO.StreamReader reader = System.IO.File.OpenText(config))
+        if (isAppveyor)
         {
-            JObject o = (JObject)JToken.ReadFrom(new JsonTextReader(reader));
+            siteDir = Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "PSDynamicParameters"));
+        }
+        else
+        {
+            using (System.IO.StreamReader reader = System.IO.File.OpenText(config))
+            {
+                JObject o = (JObject)JToken.ReadFrom(new JsonTextReader(reader));
 
-            var site = o["build"]["dest"];
+                var site = o["build"]["dest"];
 
-            siteDir = ((FilePath)config).GetDirectory().Combine(Directory(site.ToString())).ToString();
+                siteDir = ((FilePath)config).GetDirectory().Combine(Directory(site.ToString()));
+            }
         }
 
         if (DirectoryExists(siteDir))
         {
-            System.IO.Directory.Delete(siteDir, true);
+            System.IO.Directory.Delete(siteDir.ToString(), true);
         }
+
+        Information($"Writing documentation site to {siteDir}");
 
         DocFxBuild(config, new DocFxBuildSettings {
             Serve = isAppveyor ? false : serveDocs,     // Never serve docs on Appveyor as it blocks
-            Force = true
+            Force = true,
+            OutputPath = MakeAbsolute(siteDir)
         });
     });
 
