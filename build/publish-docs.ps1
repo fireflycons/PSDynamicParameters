@@ -20,7 +20,30 @@ Push-Location (Join-Path $env:APPVEYOR_BUILD_FOLDER "../fireflycons.github.io")
 
 try
 {
-    Invoke-Git status --short
+    $stat = Invoke-Git -OutputToPipeline status --short
+
+    if ($null -eq $stat)
+    {
+        Write-Host "No changes to documentation detected"
+        return
+    }
+
+    $stat |
+    ForEach-Object {
+        Write-Host $_
+    }
+
+    # Stage changes
+    Invoke-Git add --all
+
+    # Commit
+    Invoke-Git commit -m "AppVeyor Build ${env:APPVEYOR_BUILD_NUMBER}"
+
+    # and push
+    Invoke-Git push
+
+    Write-Host
+    Write-Host "Documentation changes pushed."
 }
 finally
 {

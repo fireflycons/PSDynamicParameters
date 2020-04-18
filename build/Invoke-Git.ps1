@@ -4,6 +4,8 @@ function Invoke-Git
 {
     param
     (
+        [switch]$OutputToPipeline,
+
         [Parameter(ValueFromRemainingArguments)]
         [string[]]$GitArgs
     )
@@ -23,7 +25,14 @@ function Invoke-Git
             }
             else
             {
-                Write-Host $_
+                if ($OutputToPipeline)
+                {
+                    $_
+                }
+                else
+                {
+                    Write-Host $_
+                }
             }
         }
 
