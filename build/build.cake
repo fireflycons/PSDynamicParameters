@@ -10,6 +10,9 @@ var serveDocs = Argument<bool>("serveDocs", false);
 var isAppveyor = Environment.GetEnvironmentVariables().Keys.Cast<string>().Any(k => k.StartsWith("APPVEYOR_", StringComparison.OrdinalIgnoreCase));
 var isReleasePublication = Environment.GetEnvironmentVariable("APPVEYOR_REPO_BRANCH") == "master" && Environment.GetEnvironmentVariable("APPVEYOR_REPO_TAG ") == "true";
 
+var docFxConfig = File("../docfx/docfx.json");
+DirectoryPath docFxSite;
+
 Task("Build")
     .Does(() => {
 
@@ -57,41 +60,52 @@ Task("Test")
         }
     });
 
-Task("BuildDocumentation")
+Task("InitDocumentation")
+    .Does(() => {
+        using (System.IO.StreamReader reader = System.IO.File.OpenText(docFxConfig))
+        {
+            JObject o = (JObject)JToken.ReadFrom(new JsonTextReader(reader));
+
+            var site = o["build"]["dest"];
+
+            docFxSite = ((FilePath)config).GetDirectory().Combine(Directory(site.ToString()));
+        }
+    });
+
+Task("CompileDocumentation")
     .Does(() => {
 
-        var config = File("../docfx/docfx.json");
-        DirectoryPath siteDir;
-
-        if (isAppveyor)
+        if (DirectoryExists(docFxSite))
         {
-            siteDir = Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "PSDynamicParameters"));
-        }
-        else
-        {
-            using (System.IO.StreamReader reader = System.IO.File.OpenText(config))
-            {
-                JObject o = (JObject)JToken.ReadFrom(new JsonTextReader(reader));
-
-                var site = o["build"]["dest"];
-
-                siteDir = ((FilePath)config).GetDirectory().Combine(Directory(site.ToString()));
-            }
+            System.IO.Directory.Delete(docFxSite.ToString(), true);
         }
 
-        if (DirectoryExists(siteDir))
-        {
-            System.IO.Directory.Delete(siteDir.ToString(), true);
-        }
-
-        Information($"Writing documentation site to {siteDir}");
-
-        DocFxBuild(config, new DocFxBuildSettings {
+        DocFxBuild(docFxConfig, new DocFxBuildSettings {
             Serve = isAppveyor ? false : serveDocs,     // Never serve docs on Appveyor as it blocks
-            Force = true,
-            OutputPath = MakeAbsolute(siteDir)
+            Force = true
         });
     });
+
+Task("CopyDocumentationToRepo")
+    .WithCriteria(isAppveyor)
+    .Does(() => {
+
+        outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "PSDynamicParameters")));
+
+        Information($"Updating documentation in {outputDir}");
+
+        if (Directory.Exists(outputDir))
+        {
+            Directory.Delete(outputDir.ToString(), true);
+        }
+
+        CopyDirectory(docFxSite, outputDir);
+    });
+
+Task("BuildDocumentation")
+    .IsDependentOn("InitDocumentation")
+    .IsDependentOn("CompileDocumentation")
+    .IsDependentOn("CopyDocumentationToRepo");
 
 Task("Default")
     .IsDependentOn("Build")
