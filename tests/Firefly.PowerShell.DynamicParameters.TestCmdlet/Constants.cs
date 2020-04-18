@@ -89,6 +89,11 @@
         /// </summary>
         public static readonly ScriptBlock ValidateScript = ScriptBlock.Create("$_ -ge 4 -and $_ -le 8");
 
+        /// <summary>
+        /// An array for testing value from remaining arguments
+        /// </summary>
+        public static readonly string[] RemainingArguments = new[] { "-arg1=value1", "-arg2=value2", "three" };
+
 #if NETCOREAPP
 
         /// <summary>

@@ -44,6 +44,11 @@
         ValueFromPipelineByPropertyName,
 
         /// <summary>
+        /// Tests value from remaining arguments parameter setting
+        /// </summary>
+        ValueFromRemainingArguments,
+
+        /// <summary>
         /// Tests <see cref="ValidateSetAttribute "/> passing value as an argument
         /// </summary>
         ValidateSetViaArguments,
