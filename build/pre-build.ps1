@@ -13,7 +13,7 @@ if (-not $isAppVeyor)
     return
 }
 
-Write-Host "Cloning documantion site"
+Write-Host "Cloning documention site"
 
 $script:git = Get-Command -Name Git
 
@@ -25,7 +25,7 @@ function Invoke-Git
         [string[]]$GitArgs
     )
 
-    & $git $GitArgs
+    & $git $GitArgs 2>&1
 
     if ($LASTEXITCODE -ne 0)
     {
