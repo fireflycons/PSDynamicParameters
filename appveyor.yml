@@ -10,7 +10,7 @@ image:
   - Visual Studio 2019
 
 install:
-  - ps: ./install/install.ps1
+  - ps: ./build/install.ps1
 
 # Skip on updates to the readme.
 # We can force this by adding [skip ci] or [ci skip] anywhere in commit message
