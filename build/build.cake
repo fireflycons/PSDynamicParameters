@@ -1,9 +1,9 @@
-#addin nuget:?package=Cake.DocFx&version=0.13.1
 #addin nuget:?package=Newtonsoft.Json&version=12.0.3
 
 using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 var target = Argument("target", "Default");
 var serveDocs = Argument<bool>("serveDocs", false);
@@ -83,10 +83,7 @@ Task("CompileDocumentation")
             });
         }
 
-        DocFxBuild(docFxConfig, new DocFxBuildSettings {
-            Serve = isAppveyor ? false : serveDocs,     // Never serve docs on Appveyor as it blocks
-            Force = true
-        });
+        RunDocFX(docFxConfig, isAppveyor ? false : serveDocs);
     });
 
 Task("CopyDocumentationToRepo")
@@ -136,4 +133,60 @@ string EnvironmentVariableStrict(string name)
 string EnvironmentVariableOrDefault(string name, string defaultValue)
 {
     return Environment.GetEnvironmentVariable(name) ?? defaultValue;
+}
+
+void RunDocFX(FilePath config, bool serve)
+{
+    var sb = new StringBuilder();
+
+    sb.Append($"\"{config}\" --force");
+
+    if (serve)
+    {
+        sb.Append(" --serve");
+    }
+
+    using (var process = new Process {
+        StartInfo = new ProcessStartInfo {
+
+            FileName = "docfx.exe",
+            Arguments = sb.ToString(),
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true
+        }
+    })
+    {
+        process.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
+        {
+            // Prepend line numbers to each line of the output.
+            if (!String.IsNullOrEmpty(e.Data))
+            {
+                Information(e.Data);
+            }
+        });
+
+        process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
+        {
+            // Prepend line numbers to each line of the output.
+            if (!String.IsNullOrEmpty(e.Data))
+            {
+                Error(e.Data);
+            }
+        });
+
+        process.Start();
+
+        // Asynchronously read the standard output of the spawned process.
+        // This raises OutputDataReceived events for each line of output.
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+        process.WaitForExit();
+
+        if (process.ExitCode != 0)
+        {
+            throw new Exception($"docfx exited with code {process.ExitCode}");
+        }
+    }
 }
