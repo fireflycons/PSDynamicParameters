@@ -13,7 +13,18 @@ function Invoke-Git
 
     try
     {
-        & $git $GitArgs 2>&1
+        & $git $GitArgs 2>&1 |
+        ForEach-Object {
+            if ($_ -is [System.Management.Automation.ErrorRecord])
+            {
+                Write-Host $_.ErrorDetails.Message
+            }
+            else
+            {
+                Write-Host $_
+            }
+        }
+
         $exitcode = $LASTEXITCODE
     }
     finally
