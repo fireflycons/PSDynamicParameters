@@ -15,23 +15,8 @@ if (-not $isAppVeyor)
 
 Write-Host "Cloning documention site"
 
-$script:git = Get-Command -Name Git
-
-function Invoke-Git
-{
-    param
-    (
-        [Parameter(ValueFromRemainingArguments)]
-        [string[]]$GitArgs
-    )
-
-    & $git $GitArgs 2>&1
-
-    if ($LASTEXITCODE -ne 0)
-    {
-        throw "GIT finished with exit code $LASTEXITCODE"
-    }
-}
+# Dot-source git helper
+. (Join-Path $PSScriptRoot Invoke-Git.ps1)
 
 # https://www.appveyor.com/docs/how-to/git-push/
 
