@@ -77,7 +77,10 @@ Task("CompileDocumentation")
 
         if (DirectoryExists(docFxSite))
         {
-            DeleteDirectory(docFxSite.ToString(), true);
+            DeleteDirectory(docFxSite.ToString(), new DeleteDirectorySettings {
+                Force = true,
+                Recursive = true
+            });
         }
 
         DocFxBuild(docFxConfig, new DocFxBuildSettings {
@@ -96,7 +99,10 @@ Task("CopyDocumentationToRepo")
 
         if (DirectoryExists(outputDir))
         {
-            DeleteDirectory(outputDir.ToString(), true);
+            DeleteDirectory(outputDir.ToString(), new DeleteDirectorySettings {
+                Force = true,
+                Recursive = true
+            });
         }
 
         CopyDirectory(docFxSite, outputDir);
