@@ -5,5 +5,11 @@ if (-not $cinst)
     return
 }
 
-& $cinst docfx --yes --limit-output
+& $cinst docfx --yes --limit-output |
+Foreach-Object {
+    if ($_ -inotlike 'Progress*Saving*')
+    {
+        Write-Host $_
+    }
+}
 exit $LASTEXITCODE
