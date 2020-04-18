@@ -102,7 +102,7 @@ Task("CopyDocumentationToRepo")
             });
         }
 
-        RunRobocopy(docFxSite, outputDir);
+        CopyDirectory(docFxSite, outputDir);
     });
 
 Task("BuildDocumentation")
@@ -200,3 +200,4 @@ void RunExternalProcess(string executable, string arguments)
         }
     }
 }
+

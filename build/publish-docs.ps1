@@ -28,13 +28,22 @@ try
         return
     }
 
+    # Stage changes
+    Invoke-Git add --all
+
+    # re-check status as some whitespace-only changes may be ignored
+    $stat = Invoke-Git -OutputToPipeline status --short
+
+    if ($null -eq $stat)
+    {
+        Write-Host "No changes to documentation detected"
+        return
+    }
+
     $stat |
     ForEach-Object {
         Write-Host $_
     }
-
-    # Stage changes
-    Invoke-Git add --all
 
     # Commit
     Invoke-Git commit -m "AppVeyor Build ${env:APPVEYOR_BUILD_NUMBER}"
