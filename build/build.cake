@@ -60,8 +60,9 @@ Task("Test")
         }
     });
 
-Task("InitDocumentation")
+Task("CompileDocumentation")
     .Does(() => {
+
         using (System.IO.StreamReader reader = System.IO.File.OpenText(docFxConfig))
         {
             JObject o = (JObject)JToken.ReadFrom(new JsonTextReader(reader));
@@ -70,10 +71,6 @@ Task("InitDocumentation")
 
             docFxSite = ((FilePath)docFxConfig).GetDirectory().Combine(Directory(site.ToString()));
         }
-    });
-
-Task("CompileDocumentation")
-    .Does(() => {
 
         if (DirectoryExists(docFxSite))
         {
@@ -106,7 +103,6 @@ Task("CopyDocumentationToRepo")
     });
 
 Task("BuildDocumentation")
-    .IsDependentOn("InitDocumentation")
     .IsDependentOn("CompileDocumentation")
     .IsDependentOn("CopyDocumentationToRepo");
 
