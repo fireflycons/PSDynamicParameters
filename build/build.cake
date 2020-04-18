@@ -68,7 +68,7 @@ Task("InitDocumentation")
 
             var site = o["build"]["dest"];
 
-            docFxSite = ((FilePath)config).GetDirectory().Combine(Directory(site.ToString()));
+            docFxSite = ((FilePath)docFxConfig).GetDirectory().Combine(Directory(site.ToString()));
         }
     });
 
@@ -77,7 +77,7 @@ Task("CompileDocumentation")
 
         if (DirectoryExists(docFxSite))
         {
-            System.IO.Directory.Delete(docFxSite.ToString(), true);
+            DeleteDirectory(docFxSite.ToString(), true);
         }
 
         DocFxBuild(docFxConfig, new DocFxBuildSettings {
@@ -90,13 +90,13 @@ Task("CopyDocumentationToRepo")
     .WithCriteria(isAppveyor)
     .Does(() => {
 
-        outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "PSDynamicParameters")));
+        var outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "PSDynamicParameters")));
 
         Information($"Updating documentation in {outputDir}");
 
-        if (Directory.Exists(outputDir))
+        if (DirectoryExists(outputDir))
         {
-            Directory.Delete(outputDir.ToString(), true);
+            DeleteDirectory(outputDir.ToString(), true);
         }
 
         CopyDirectory(docFxSite, outputDir);
