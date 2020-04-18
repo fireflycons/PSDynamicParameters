@@ -25,7 +25,7 @@ function Invoke-Git
             }
             else
             {
-                if (-not ([string]::IsNullOrEmpty($_)))
+                if (-not ([string]::IsNullOrWhitespace($_)))
                 {
                     if ($OutputToPipeline)
                     {
