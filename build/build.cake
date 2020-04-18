@@ -102,7 +102,7 @@ Task("CopyDocumentationToRepo")
             });
         }
 
-        CopyDirectory(docFxSite, outputDir);
+        RunRobocopy(docFxSite, outputDir);
     });
 
 Task("BuildDocumentation")
@@ -146,11 +146,21 @@ void RunDocFX(FilePath config, bool serve)
         sb.Append(" --serve");
     }
 
+    RunExternalProcess("docfx.exe", sb.ToString());
+}
+
+void RunRobocopy(DirectoryPath source, DirectoryPath dest)
+{
+    RunExternalProcess("robocopy.exe", $"/mir \"{source}\" \"{dest}\"");
+}
+
+void RunExternalProcess(string executable, string arguments)
+{
     using (var process = new Process {
         StartInfo = new ProcessStartInfo {
 
-            FileName = "docfx.exe",
-            Arguments = sb.ToString(),
+            FileName = executable,
+            Arguments = arguments,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
