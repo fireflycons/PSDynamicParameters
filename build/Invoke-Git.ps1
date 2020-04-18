@@ -21,7 +21,17 @@ function Invoke-Git
         ForEach-Object {
             if ($_ -is [System.Management.Automation.ErrorRecord])
             {
-                Write-Host "Error: $($_.ErrorDetails.Message)"
+                $msg = $(
+                    if (-not ([string]::IsNullOrEmpty($_.ErrorDetails.Message)))
+                    {
+                        $_.ErrorDetails.Message
+                    }
+                    else
+                    {
+                        $_.Exception.Message
+                    }
+                )
+                Write-Host "Error: $msg"
             }
             else
             {
