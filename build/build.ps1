@@ -113,29 +113,6 @@ try
     $PACKAGES_CONFIG = Join-Path $TOOLS_DIR "packages.config"
     $PACKAGES_CONFIG_MD5 = Join-Path $TOOLS_DIR "packages.config.md5sum"
 
-    if ($IsLinuxOS)
-    {
-        # First, we need to fix a bug in Bamboo artifact extraction
-        Write-Host "Fixing artifact extraction - Bamboo extracts Windows paths explictly on Linux"
-        Get-ChildItem -Path $PSScriptRoot |
-        Where-Object {
-            $_.Name.Contains('\')
-        } |
-        Foreach-Object {
-            $linuxPath = $_.Name.Replace('\', '/')
-            $directory = Join-Path $PSScriptRoot ([IO.Path]::GetDirectoryName($linuxPath))
-
-            Write-Host "  $($_.Name) -> $linuxPath"
-
-            if (-not (Test-Path -Path $directory -PathType Container))
-            {
-                New-Item -Path $directory -ItemType Directory | Out-Null
-            }
-
-            [IO.File]::Move($_.FullName, (Join-Path $PSScriptRoot $linuxPath))
-        }
-    }
-
     # Should we use the new Roslyn?
     $UseExperimental = [string]::Empty;
     if ($Experimental.IsPresent)
