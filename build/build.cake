@@ -7,74 +7,110 @@ using System.Diagnostics;
 
 var target = Argument("target", "Default");
 var serveDocs = Argument<bool>("serveDocs", false);
-var isAppveyor = Environment.GetEnvironmentVariables().Keys.Cast<string>().Any(k => k.StartsWith("APPVEYOR_", StringComparison.OrdinalIgnoreCase));
-var isReleasePublication = Environment.GetEnvironmentVariable("APPVEYOR_REPO_BRANCH") == "master" && Environment.GetEnvironmentVariable("APPVEYOR_REPO_TAG ") == "true";
-
+var isAppveyor = EnvironmentVariable("APPVEYOR") != null;
+var isReleasePublication = isAppveyor && EnvironmentVariable("APPVEYOR_REPO_BRANCH") == "master" && EnvironmentVariable("APPVEYOR_REPO_TAG ") == "true";
+var canPublishDocs = isAppveyor && EnvironmentVariable<string>("APPVEYOR_REPO_NAME", "none").StartsWith("fireflycons/");
 var docFxConfig = File("../docfx/docfx.json");
+var testResultsDir = Directory(EnvironmentVariable<string>("APPVEYOR_BUILD_FOLDER", "..")) + Directory("test-output");
+
 DirectoryPath docFxSite;
 
-Task("Build")
+Task("BuildOnWindows")
+    .WithCriteria(IsRunningOnWindows())
     .Does(() => {
 
         DotNetCoreBuild("../Firefly.PowerShell.DynamicParameters.sln", new DotNetCoreBuildSettings
         {
             Configuration = "Release"
         });
-
     });
 
-
-Task("Test")
+Task("BuildOnLinux")
+    .WithCriteria(IsRunningOnUnix())
     .Does(() => {
 
-        var resultsDir = Directory(System.IO.Path.Combine(EnvironmentVariableOrDefault("APPVEYOR_BUILD_FOLDER", ".."), "test-output"));
+        foreach (var framework in new [] { "netcoreapp2.1", "netcoreapp3.1"})
+        {
+            Information($"Building {framework}");
+
+            DotNetCoreBuild("../Firefly.PowerShell.DynamicParameters.sln", new DotNetCoreBuildSettings
+            {
+                Configuration = "Release",
+                Framework = framework
+            });
+        }
+    });
+
+Task("Build")
+    .IsDependentOn("BuildOnWindows")
+    .IsDependentOn("BuildOnLinux");
+
+
+Task("TestOnWindows")
+    .WithCriteria(IsRunningOnWindows())
+    .Does(() => {
+
         try
         {
-            // ArgumentCustomization = args=>args.Append("-StorePasswordInClearText")
-            foreach (var fw in new [] { "net452", "netcoreapp2.1", "netcoreapp3.1"})
+            DotNetCoreTest("../tests/Firefly.PowerShell.DynamicParameters.Tests/Firefly.PowerShell.DynamicParameters.Tests.csproj", new DotNetCoreTestSettings
             {
-                var settings = new DotNetCoreTestSettings
+                Configuration = "Release",
+                NoBuild = true,
+                Logger = "trx",
+                ResultsDirectory = testResultsDir
+            });
+        }
+        finally
+        {
+            UploadTestResults();
+        }
+    });
+
+Task("TestOnLinux")
+    .WithCriteria(IsRunningOnUnix())
+    .Does(() => {
+
+        try
+        {
+            foreach (var framework in new [] { "netcoreapp2.1", "netcoreapp3.1"})
+            {
+                Information($"Testing {framework}");
+
+                DotNetCoreTest("../tests/Firefly.PowerShell.DynamicParameters.Tests/Firefly.PowerShell.DynamicParameters.Tests.csproj", new DotNetCoreTestSettings
                 {
                     Configuration = "Release",
                     NoBuild = true,
-                    Framework = fw,
+                    Framework = framework,
                     Logger = "trx",
-                    ResultsDirectory = resultsDir
-                };
-
-                DotNetCoreTest("../tests/Firefly.PowerShell.DynamicParameters.Tests/Firefly.PowerShell.DynamicParameters.Tests.csproj", settings);
+                    ResultsDirectory = testResultsDir
+                });
             }
         }
         finally
         {
-            if (isAppveyor)
-            {
-                using (var wc = new WebClient())
-                {
-                    foreach(var result in GetFiles(resultsDir + File("*.trx")))
-                    {
-                        wc.UploadFile($"https://ci.appveyor.com/api/testresults/mstest/{EnvironmentVariableStrict("APPVEYOR_JOB_ID")}", result.ToString());
-                    }
-                }
-            }
+            UploadTestResults();
         }
     });
 
+Task("Test")
+    .IsDependentOn("TestOnWindows")
+    .IsDependentOn("TestOnLinux");
+
 Task("CompileDocumentation")
+    .WithCriteria(IsRunningOnWindows())
     .Does(() => {
 
         using (System.IO.StreamReader reader = System.IO.File.OpenText(docFxConfig))
         {
-            JObject o = (JObject)JToken.ReadFrom(new JsonTextReader(reader));
+            var jsonConfig = (JObject)JToken.ReadFrom(new JsonTextReader(reader));
+            var site = jsonConfig["build"]["dest"].Value<string>();
 
-            var site = o["build"]["dest"];
-
-            docFxSite = ((FilePath)docFxConfig).GetDirectory().Combine(Directory(site.ToString()));
+            docFxSite = ((FilePath)docFxConfig).GetDirectory().Combine(Directory(site));
         }
 
         if (DirectoryExists(docFxSite))
         {
-            DeleteDirectory(docFxSite.ToString(), new DeleteDirectorySettings {
+            DeleteDirectory(docFxSite, new DeleteDirectorySettings {
                 Force = true,
                 Recursive = true
             });
@@ -84,7 +120,7 @@ Task("CompileDocumentation")
     });
 
 Task("CopyDocumentationToRepo")
-    .WithCriteria(isAppveyor)
+    .WithCriteria(canPublishDocs)
     .Does(() => {
 
         var outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "PSDynamicParameters")));
@@ -114,21 +150,34 @@ Task("Default")
 RunTarget(target);
 
 
+#region Helper Functions
+
+void UploadTestResults()
+{
+    if (!isAppveyor)
+    {
+        return;
+    }
+
+    using (var wc = new WebClient())
+    {
+        foreach(var result in GetFiles(testResultsDir + File("*.trx")))
+        {
+            wc.UploadFile($"https://ci.appveyor.com/api/testresults/mstest/{EnvironmentVariableStrict("APPVEYOR_JOB_ID")}", result.ToString());
+        }
+    }
+}
+
 string EnvironmentVariableStrict(string name)
 {
-    var val = Environment.GetEnvironmentVariable(name);
+    var val = EnvironmentVariable(name);
 
     if (string.IsNullOrEmpty(val))
     {
-        throw new CakeException($"Variable '{name}' not found");
+        throw new CakeException($"Required environment variable '{name}' not set.");
     }
 
     return val;
-}
-
-string EnvironmentVariableOrDefault(string name, string defaultValue)
-{
-    return Environment.GetEnvironmentVariable(name) ?? defaultValue;
 }
 
 void RunDocFX(FilePath config, bool serve)
@@ -143,11 +192,6 @@ void RunDocFX(FilePath config, bool serve)
     }
 
     RunExternalProcess("docfx.exe", sb.ToString());
-}
-
-void RunRobocopy(DirectoryPath source, DirectoryPath dest)
-{
-    RunExternalProcess("robocopy.exe", $"/mir \"{source}\" \"{dest}\"");
 }
 
 void RunExternalProcess(string executable, string arguments)
@@ -197,3 +241,4 @@ void RunExternalProcess(string executable, string arguments)
     }
 }
 
+#endregion

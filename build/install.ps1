@@ -1,3 +1,6 @@
+# Dot-source vars describing environment
+. (Join-Path $PSScriptRoot build-environment.ps1)
+
 $cinst = Get-Command -Name cinst -ErrorAction SilentlyContinue
 if (-not $cinst)
 {

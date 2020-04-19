@@ -1,15 +1,23 @@
+
 if ($PSEdition -eq 'Core')
 {
     Write-Host "Publish docs step not in scope in this environment"
     return
 }
 
-$isAppVeyor = $null -ne (Get-ChildItem env: | Where-Object { $_.Name -ilike 'APPVEYOR*' } | Select-Object -First 1)
+# Dot-source vars describing environment
+. (Join-Path $PSScriptRoot build-environment.ps1)
 
 # TODO - Only if master and repo_tag
 if (-not $isAppVeyor)
 {
     Write-Host "Publish docs step not in scope in this environment"
+    return
+}
+
+if (-not $canPublishDocs)
+{
+    Write-Host "Cannot publish docs in forked repo"
     return
 }
 
@@ -20,7 +28,7 @@ Push-Location (Join-Path $env:APPVEYOR_BUILD_FOLDER "../fireflycons.github.io")
 
 try
 {
-    # Stage any changes
+    # Stage any changes, suppressing line ending warnings (nearly all at least)
     Invoke-Git -SuppressWarnings add --all
 
     # Check status
@@ -28,7 +36,7 @@ try
 
     if ($null -eq $stat)
     {
-        Write-Host "No changes to documentation detected"
+        Write-Host "No overall changes to documentation detected - nothing to push."
         return
     }
 
