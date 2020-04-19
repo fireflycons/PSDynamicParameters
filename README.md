@@ -17,7 +17,7 @@ The nuget package contains the following builds
 * NETCORE 2.1 - PowerShell Core 6
 * NETCORE 3.1 - PowerShell Core 7
 
-Currently this can only be verified for Windows due to [this issue](https://github.com/PowerShell/PowerShell/issues/12381) I found while running the tests on Ubuntu.
+Currently this can only be verified for Windows due to [this issue](https://github.com/PowerShell/PowerShell/issues/12383) I found while running the tests on Ubuntu.
 
 ## Library Documentation
 
