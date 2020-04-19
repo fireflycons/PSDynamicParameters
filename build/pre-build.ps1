@@ -25,12 +25,15 @@ if ($isAppVeyor)
     ConvertTo-Json
 
     Write-Host "Setting build SDK to .NET core $net31latest"
-    Get-ChildItem -Path (Join-Path $PSScriptRoot '..') -Filter *.csproj -Recurse |
+    Invoke-Command -NoNewScope {
+        Get-ChildItem -Path (Join-Path $PSScriptRoot '..') -Filter *.csproj -Recurse
+        Get-ChildItem -Path (Join-Path $PSScriptRoot '..') -Filter *.sln -Recurse
+    } |
     Foreach-Object {
 
         $filename = Join-Path $_.DirectoryName 'global.json'
         [System.IO.File]::WriteAllText($filename, $globalJson, [System.Text.Encoding]::ASCII)
-        Write-Host "- Wrote $globalJson"
+        Write-Host "- Wrote $filename"
     }
 }
 
