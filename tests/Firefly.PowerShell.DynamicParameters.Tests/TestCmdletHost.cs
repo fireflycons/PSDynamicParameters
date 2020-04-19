@@ -181,11 +181,11 @@
                     powershell.AddParameter("TestValue", dynamicParameterValue);
                 }
 
+                // All objects emitted to pipeline by executing PowerShell code are collected
+                result = powershell.Invoke();
+
                 try
                 {
-                    // All objects emitted to pipeline by executing PowerShell code are collected
-                    result = powershell.Invoke();
-
                     // Get first exception from script, if any
                     var errorRecord = powershell.Streams.Error.FirstOrDefault();
 
@@ -193,22 +193,6 @@
                     {
                         throw errorRecord.Exception;
                     }
-/*
-                    // This block provides an example of handling errors returned by an embedded PowerShell host
-                    if (powershell.HadErrors)
-                    {
-
-#if WINDOWS
-                        // Else errors from the host if any. This property not present in Linux
-                        if (powershell.InvocationStateInfo.Reason != null)
-                        {
-                            throw new CmdletInvocationException(powershell.InvocationStateInfo.Reason.Message);
-                        }
-#endif
-                        // Else we don't know what happened.
-                        throw new Exception("Unknown error");
-                    }
-*/
                 }
                 catch (PlatformNotSupportedException e)
                 {
