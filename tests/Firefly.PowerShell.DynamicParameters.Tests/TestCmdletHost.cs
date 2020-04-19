@@ -199,9 +199,12 @@
 
 
                     // Else errors from the host if any. This property not present in Linux
-                    if (IsWindows && powershell.InvocationStateInfo.Reason != null)
+                    if (IsWindows)
                     {
-                        throw new CmdletInvocationException(powershell.InvocationStateInfo.Reason.Message);
+                        if (powershell.InvocationStateInfo.Reason != null)
+                        {
+                            throw new CmdletInvocationException(powershell.InvocationStateInfo.Reason.Message);
+                        }
                     }
 
                     // Else we don't know what happened.
