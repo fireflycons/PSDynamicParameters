@@ -1,11 +1,6 @@
 # Dot-source vars describing environment
 . (Join-Path $PSScriptRoot build-environment.ps1)
 
-if ($PSEdition -eq 'Core' -and $IsLinux)
-{
-    & dotnet-core-uninstall --all-previews
-}
-
 $cinst = Get-Command -Name cinst -ErrorAction SilentlyContinue
 if (-not $cinst)
 {
