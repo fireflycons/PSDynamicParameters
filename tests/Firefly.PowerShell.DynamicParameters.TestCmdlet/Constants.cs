@@ -69,7 +69,7 @@
         /// Reason for marking exception tests inconclusive in Linux
         /// </summary>
         public const string SkipReason =
-            "Cannot test exceptions in Linux. See https://github.com/PowerShell/PowerShell/issues/12383";
+            "Cannot test exceptions recorded by embedded PowerShell host on Linux.\nSee https://github.com/PowerShell/PowerShell/issues/12383";
 
         /// <summary>
         /// Validate Set valid values
