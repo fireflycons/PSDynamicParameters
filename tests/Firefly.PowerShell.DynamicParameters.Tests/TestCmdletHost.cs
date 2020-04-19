@@ -118,7 +118,10 @@
         /// <param name="dynamicParameterValue">Value to pass to the dynamic parameter. If <c>null</c>, then omit parameter. If it is the type <see cref="DBNull"/>, pass <c>null</c> explicitly as the value</param>
         /// <param name="alias">Name of parameter alias for alias tests.</param>
         /// <returns>Pipeline output</returns>
-        public static Collection<PSObject> RunTestHost(TestCases testNumber, object dynamicParameterValue, string alias = null)
+        public static Collection<PSObject> RunTestHost(
+            TestCases testNumber,
+            object dynamicParameterValue,
+            string alias = null)
         {
             Collection<PSObject> result;
 
@@ -178,21 +181,22 @@
                     powershell.AddParameter("TestValue", dynamicParameterValue);
                 }
 
-                // All objects emitted to pipeline by executing PowerShell code are collected
-                result = powershell.Invoke();
-
                 try
                 {
+                    // All objects emitted to pipeline by executing PowerShell code are collected
+                    result = powershell.Invoke();
+
+                    // Get first exception from script, if any
+                    var errorRecord = powershell.Streams.Error.FirstOrDefault();
+
+                    if (errorRecord != null)
+                    {
+                        throw errorRecord.Exception;
+                    }
+/*
                     // This block provides an example of handling errors returned by an embedded PowerShell host
                     if (powershell.HadErrors)
                     {
-                        // Get first exception from script, if any
-                        var errorRecord = powershell.Streams.Error.FirstOrDefault();
-
-                        if (errorRecord != null)
-                        {
-                            throw errorRecord.Exception;
-                        }
 
 #if WINDOWS
                         // Else errors from the host if any. This property not present in Linux
@@ -204,10 +208,12 @@
                         // Else we don't know what happened.
                         throw new Exception("Unknown error");
                     }
+*/
                 }
                 catch (PlatformNotSupportedException e)
                 {
-                    throw new Exception($"Caught PlatformNotSupportedException\n{e.StackTrace}`n======================================");
+                    throw new Exception(
+                        $"Caught PlatformNotSupportedException\n{e.StackTrace}`n======================================");
                 }
             }
 
