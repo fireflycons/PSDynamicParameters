@@ -3,7 +3,7 @@ $isAppVeyor = $null -ne $env:APPVEYOR
 if ($isAppVeyor)
 {
     # Filter out netcore 5 preview and select latest netcoe 3.1
-    $net31lts = dotnet --info |
+    $net31latest = dotnet --info |
     Foreach-Object {
         if ($_ -match '^\s+(3\.1\.\d+)')
         {
@@ -12,24 +12,25 @@ if ($isAppVeyor)
         Sort-Object -Descending |
         Select-Object -first 1
 
-    if (-not $net31lts)
+    if (-not $net31latest)
     {
         throw "Cannot find .NET core 3.1 SDK"
     }
 
     $globalJson = @{
         sdk = @{
-            version = $net31lts.ToString()
+            version = $net31latest.ToString()
         }
     } |
     ConvertTo-Json
 
-    Write-Host "Setting build SDK to .NET core $net31lts"
+    Write-Host "Setting build SDK to .NET core $net31latest"
     Get-ChildItem -Path (Join-Path $PSScriptRoot '..') -Filter *.csproj -Recurse |
     Foreach-Object {
 
         $filename = Join-Path $_.DirectoryName 'global.json'
-        [System.IO.File]::WriteAllText($filename, $globalJson)
+        [System.IO.File]::WriteAllText($filename, $globalJson, [System.Text.Encoding]::ASCII)
+        Write-Host "- Wrote $globalJson"
     }
 }
 

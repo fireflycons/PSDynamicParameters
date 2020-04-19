@@ -120,7 +120,8 @@ Task("CompileDocumentation")
         RunDocFX(docFxConfig, isAppveyor ? false : serveDocs);
     });
 
-Task("CopyDocumentationToRepo")
+Task("CopyDocumentationTo-github.io-clone")
+    .WithCriteria(IsRunningOnWindows())
     .WithCriteria(canPublishDocs)
     .Does(() => {
 
@@ -141,7 +142,7 @@ Task("CopyDocumentationToRepo")
 
 Task("BuildDocumentation")
     .IsDependentOn("CompileDocumentation")
-    .IsDependentOn("CopyDocumentationToRepo");
+    .IsDependentOn("CopyDocumentationTo-github.io-clone");
 
 Task("Default")
     .IsDependentOn("Build")
