@@ -183,7 +183,7 @@
 
                 // All objects emitted to pipeline by executing PowerShell code are collected
                 result = powershell.Invoke();
-/*
+
                 try
                 {
                     // Get first exception from script, if any
@@ -199,7 +199,7 @@
                     throw new Exception(
                         $"Caught PlatformNotSupportedException\n{e.StackTrace}`n======================================");
                 }
-*/
+
             }
 
             return result;
