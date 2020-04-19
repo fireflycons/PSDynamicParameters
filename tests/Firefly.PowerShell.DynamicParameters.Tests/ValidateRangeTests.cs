@@ -24,7 +24,7 @@
         [InlineData(9)]
         public void Test_WhenValueIsOutOfRange_ThenParameterBindingExceptionIsThrown(int value)
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidateRangeWithMinMax, value);
 
@@ -79,7 +79,7 @@
         [InlineData(int.MinValue)]
         public void Test_WhenValueIsOutOfRangeKind_ThenParameterBindingExceptionIsThrown(int value)
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidateRangeWithRangeKindNonNegative, value);
 

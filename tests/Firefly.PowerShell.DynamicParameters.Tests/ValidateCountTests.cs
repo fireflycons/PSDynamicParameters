@@ -46,7 +46,7 @@
         [InlineData(5)]
         public void Test_WhenArrayLengthIsOutsideCountValidation_ThenParameterBindingExceptionIsThrown(int arrayLength)
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             var testArray = new string[arrayLength];
 

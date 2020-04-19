@@ -25,7 +25,7 @@
         [InlineData(9)]
         public void Test_WhenValueIsOutOfRangeCheckedByScript_ThenParameterBindingExceptionIsThrown(int value)
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidateScript, value);
 

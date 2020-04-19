@@ -15,7 +15,7 @@
         public void
             Test_WhenParameterValueIsNull_AndValidateNotNullAttributeIsPresent_ThenParameterBindingExceptionIsThrown()
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             var expectedMessage =
                 $"Cannot validate argument on parameter '{Constants.DynamicParameterName}'. The argument is null. Provide a valid value for the argument, and then try running the command again.";
@@ -28,7 +28,7 @@
         public void
             Test_WhenParameterValueIsNull_AndValidateNotNullOrEmptyAttributeIsPresent_ThenParameterBindingExceptionIsThrown()
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             var expectedMessage =
                 $"Cannot validate argument on parameter '{Constants.DynamicParameterName}'. The argument is null or empty. Provide an argument that is not null or empty, and then try the command again.";

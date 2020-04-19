@@ -25,7 +25,7 @@
         public void Test_WhenStringLengthIsOutsideLengthValidation_ThenParameterBindingExceptionIsThrown(
             int stringLength)
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             var testString = string.Empty.PadLeft(stringLength);
 

@@ -27,7 +27,7 @@
             Test_WhenInvalidIPAddressesArePassedToParameterWithIPValidationRegexObject_ThenParameterBindingExceptionIsThrown(
                 string ipAddress)
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             var expectedMessage =
                 $"Cannot validate argument on parameter 'TestParameter'. The argument \"{ipAddress}\" does not match the \"{Constants.IpAddressRegex}\" pattern. Supply an argument that matches \"{Constants.IpAddressRegex}\" and try the command again.";
@@ -48,7 +48,7 @@
             Test_WhenInvalidIPAddressesArePassedToParameterWithIPValidationRegex_ThenParameterBindingExceptionIsThrown(
                 string ipAddress)
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             var expectedMessage =
                 $"Cannot validate argument on parameter 'TestParameter'. The argument \"{ipAddress}\" does not match the \"{Constants.IpAddressRegex}\" pattern. Supply an argument that matches \"{Constants.IpAddressRegex}\" and try the command again.";
@@ -67,7 +67,7 @@
         [InlineData("8.8.8.8")]
         public void Test_WhenValidIPAddressesArePassedToParameterWithIPValidationRegex_TheyAreReturned(string ipAddress)
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             var result = TestCmdletHost.RunTestHost(TestCases.ValidatePatternViaArguments, ipAddress);
 
@@ -102,7 +102,7 @@
         public void
             Test_WhenValueDoesNotMatchCaseSensitiveRegex_ThenParameterBindingExceptionIsThrown()
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             const string TestValue = "ABC";
 
@@ -121,7 +121,7 @@
         public void
             Test_WhenValueDoesNotMatchCaseSensitiveRegexObject_ThenParameterBindingExceptionIsThrown()
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             const string TestValue = "ABC";
 
@@ -172,7 +172,7 @@
         public void
             Test_WhenInvalidIPAddressesArePassedToParameterWithIPValidationRegexAndCustomErrorMessage_ThenParameterBindingExceptionIsThrownWithCustomMessage()
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             const string IpAddress = "256.0.0.0";
             var customError = string.Format(Constants.InvalidIpAddressCustomMessage, IpAddress);

@@ -66,6 +66,12 @@
         public const string DynamicParameterSetsSetB = "SetB";
 
         /// <summary>
+        /// Reason for marking exception tests inconclusive in Linux
+        /// </summary>
+        public const string SkipReason =
+            "Cannot test exceptions in Linux. See https://github.com/PowerShell/PowerShell/issues/12383";
+
+        /// <summary>
         /// Validate Set valid values
         /// </summary>
         public static readonly string[] ValidStrings = { "One", "Two", "Three" };
@@ -97,6 +103,9 @@
 
 #if NETCOREAPP
 
+        /// <summary>
+        /// <c>true</c>> if tests are running on Windows; else <c>false</c>.
+        /// </summary>
         public static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
         /// <summary>
@@ -104,6 +113,9 @@
         /// </summary>
         public const ValidateRangeKind ValidRangeKindNonNegative = ValidateRangeKind.NonNegative;
 #else
+        /// <summary>
+        /// Alsways <c>true</c>> as NET Framework is only run on Windows.
+        /// </summary>
         public const bool IsWindows = true;
 #endif
     }

@@ -17,7 +17,7 @@
         [SkippableFact]
         public void Test_WhenMandatoryValueNotSupplied_ThenParameterBindingExceptionIsThrown()
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             var expectedMessage =
                 "Cannot process command because of one or more missing mandatory parameters: TestParameter.";

@@ -24,7 +24,7 @@
         [InlineData(1)]
         public void Test_WhenInvalidValuesAreGivenOnCommandLine_ThenParameterBindingExceptionIsThrown(object value)
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidateSetViaArguments, value);
 
@@ -36,7 +36,7 @@
         [SkippableFact]
         public void Test_WhenInvalidValuesAreGivenOnCommandLineAndCustomErrorMessage_ThenParameterBindingExceptionIsThrownWithCustomMessage()
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             const string Value = "Four";
             var customError = string.Format(Constants.InvalidParameterValueCustomMessage, Value);
@@ -59,7 +59,7 @@
         [InlineData(1)]
         public void Test_WhenInvalidValuesArePiped_ThenParameterBindingExceptionIsThrown(object value)
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidateSetFromPipeline, value);
 
@@ -131,7 +131,7 @@
         [SkippableFact]
         public void Test_WhenPocoWithInvalidPropertyValueIsPiped_ThenParameterBindingExceptionIsThrown()
         {
-            Skip.IfNot(Constants.IsWindows);
+            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
 
             const string InvalidValue = "Four";
 
