@@ -1,10 +1,44 @@
+$isAppVeyor = $null -ne $env:APPVEYOR
+
+if ($isAppVeyor)
+{
+    # Filter out netcore 5 preview and select latest netcoe 3.1
+    $net31lts = dotnet --info |
+    Foreach-Object {
+        if ($_ -match '^\s+(3\.1\.\d+)')
+        {
+            [Version]$Matches.0 }
+        } |
+        Sort-Object -Descending |
+        Select-Object -first 1
+
+    if (-not $net31lts)
+    {
+        throw "Cannot find .NET core 3.1 SDK"
+    }
+
+    $globalJson = @{
+        sdk = @{
+            version = $net31lts.ToString()
+        }
+    } |
+    ConvertTo-Json
+
+    Write-Host "Setting build SDK to .NET core $net31lts"
+    Get-ChildItem -Path (Join-Path $PSScriptRoot '..') -Filter *.csproj -Recurse |
+    Foreach-Object {
+
+        $filename = Join-Path $_.DirectoryName 'global.json'
+        [System.IO.File]::WriteAllText($filename, $globalJson)
+    }
+}
+
 if ($PSEdition -eq 'Core')
 {
     Write-Host "Publish docs step not in scope in this environment"
     return
 }
 
-$isAppVeyor = $null -ne (Get-ChildItem env: | Where-Object { $_.Name -ilike 'APPVEYOR*' } | Select-Object -First 1)
 
 # TODO - Only if master and repo_tag
 if (-not $isAppVeyor)
