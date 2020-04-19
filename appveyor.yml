@@ -22,7 +22,7 @@ before_build:
   - ps: ./build/pre-build.ps1
 
 build_script:
-  - ps: ./build/build.ps1 -configuration=Debug
+  - ps: ./build/build.ps1 -Configuration Debug
 
 test: off
 
