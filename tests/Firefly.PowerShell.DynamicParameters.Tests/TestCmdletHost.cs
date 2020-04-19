@@ -111,11 +111,6 @@
         /// </summary>
         private static readonly string CmdletModulePath = typeof(ShowDynamicParameterCommand).Assembly.Location;
 
-#if NETCOREAPP
-        private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#else
-        private static readonly bool IsWindows = true;
-#endif
         /// <summary>
         /// Runs the <see cref="ShowDynamicParameterCommand"/> with arguments for test and collects results
         /// </summary>
@@ -199,23 +194,20 @@
                             throw errorRecord.Exception;
                         }
 
-
+#if WINDOWS
                         // Else errors from the host if any. This property not present in Linux
-                        if (IsWindows)
+                        if (powershell.InvocationStateInfo.Reason != null)
                         {
-                            if (powershell.InvocationStateInfo.Reason != null)
-                            {
-                                throw new CmdletInvocationException(powershell.InvocationStateInfo.Reason.Message);
-                            }
+                            throw new CmdletInvocationException(powershell.InvocationStateInfo.Reason.Message);
                         }
-
+#endif
                         // Else we don't know what happened.
                         throw new Exception("Unknown error");
                     }
                 }
                 catch (PlatformNotSupportedException e)
                 {
-                    throw new Exception($"Caught PlatformNotSupportedException - IsWindows = {IsWindows}\n{e.StackTrace}`n======================================");
+                    throw new Exception($"Caught PlatformNotSupportedException\n{e.StackTrace}`n======================================");
                 }
             }
 
