@@ -186,29 +186,36 @@
                 // All objects emitted to pipeline by executing PowerShell code are collected
                 result = powershell.Invoke();
 
-                // This block provides an example of handling errors returned by an embedded PowerShell host
-                if (powershell.HadErrors)
+                try
                 {
-                    // Get first exception from script, if any
-                    var errorRecord = powershell.Streams.Error.FirstOrDefault();
-
-                    if (errorRecord != null)
+                    // This block provides an example of handling errors returned by an embedded PowerShell host
+                    if (powershell.HadErrors)
                     {
-                        throw errorRecord.Exception;
-                    }
+                        // Get first exception from script, if any
+                        var errorRecord = powershell.Streams.Error.FirstOrDefault();
 
-
-                    // Else errors from the host if any. This property not present in Linux
-                    if (IsWindows)
-                    {
-                        if (powershell.InvocationStateInfo.Reason != null)
+                        if (errorRecord != null)
                         {
-                            throw new CmdletInvocationException(powershell.InvocationStateInfo.Reason.Message);
+                            throw errorRecord.Exception;
                         }
-                    }
 
-                    // Else we don't know what happened.
-                    throw new Exception("Unknown error");
+
+                        // Else errors from the host if any. This property not present in Linux
+                        if (IsWindows)
+                        {
+                            if (powershell.InvocationStateInfo.Reason != null)
+                            {
+                                throw new CmdletInvocationException(powershell.InvocationStateInfo.Reason.Message);
+                            }
+                        }
+
+                        // Else we don't know what happened.
+                        throw new Exception("Unknown error");
+                    }
+                }
+                catch (PlatformNotSupportedException e)
+                {
+                    throw new Exception($"Caught PlatformNotSupportedException - IsWindows = {IsWindows}\n{e.StackTrace}`n======================================");
                 }
             }
 
