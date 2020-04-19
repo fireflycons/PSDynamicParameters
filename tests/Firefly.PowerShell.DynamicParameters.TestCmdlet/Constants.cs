@@ -1,6 +1,7 @@
 ﻿namespace Firefly.PowerShell.DynamicParameters.TestCmdlet
 {
     using System.Management.Automation;
+    using System.Runtime.InteropServices;
 
     public static class Constants
     {
@@ -96,10 +97,14 @@
 
 #if NETCOREAPP
 
+        public static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
         /// <summary>
         /// A range kind for Validate Range tests
         /// </summary>
         public const ValidateRangeKind ValidRangeKindNonNegative = ValidateRangeKind.NonNegative;
+#else
+        public const bool IsWindows = true;
 #endif
     }
 }

@@ -20,11 +20,13 @@
         /// Tests that when value is out of range then parameter binding exception is thrown.
         /// </summary>
         /// <param name="value">The value.</param>
-        [Theory]
+        [SkippableTheory]
         [InlineData(3)]
         [InlineData(9)]
         public void Test_WhenValueIsOutOfRangeCheckedByScript_ThenParameterBindingExceptionIsThrown(int value)
         {
+            Skip.IfNot(Constants.IsWindows);
+
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidateScript, value);
 
             action.Should().Throw<ParameterBindingException>();

@@ -19,12 +19,14 @@
         /// <seealso cref="Constants.ValidLengths"/>
         /// </summary>
         /// <param name="stringLength">Length of the string.</param>
-        [Theory]
+        [SkippableTheory]
         [InlineData(2)]
         [InlineData(5)]
         public void Test_WhenStringLengthIsOutsideLengthValidation_ThenParameterBindingExceptionIsThrown(
             int stringLength)
         {
+            Skip.IfNot(Constants.IsWindows);
+
             var testString = string.Empty.PadLeft(stringLength);
 
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidateLength, testString);

@@ -14,9 +14,11 @@
         /// <summary>
         /// Tests the when mandatory value not supplied then parameter binding exception is thrown.
         /// </summary>
-        [Fact]
+        [SkippableFact]
         public void Test_WhenMandatoryValueNotSupplied_ThenParameterBindingExceptionIsThrown()
         {
+            Skip.IfNot(Constants.IsWindows);
+
             var expectedMessage =
                 "Cannot process command because of one or more missing mandatory parameters: TestParameter.";
 

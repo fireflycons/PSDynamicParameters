@@ -19,11 +19,13 @@
         /// Tests that when invalid values are given on command line they throw <see cref="ParameterBindingException"/>.
         /// </summary>
         /// <param name="value">The value.</param>
-        [Theory]
+        [SkippableTheory]
         [InlineData("Four")]
         [InlineData(1)]
         public void Test_WhenInvalidValuesAreGivenOnCommandLine_ThenParameterBindingExceptionIsThrown(object value)
         {
+            Skip.IfNot(Constants.IsWindows);
+
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidateSetViaArguments, value);
 
             action.Should().Throw<ParameterBindingException>();
@@ -31,9 +33,11 @@
 
 #if NETCOREAPP3_1
 
-        [Fact]
+        [SkippableFact]
         public void Test_WhenInvalidValuesAreGivenOnCommandLineAndCustomErrorMessage_ThenParameterBindingExceptionIsThrownWithCustomMessage()
         {
+            Skip.IfNot(Constants.IsWindows);
+
             const string Value = "Four";
             var customError = string.Format(Constants.InvalidParameterValueCustomMessage, Value);
             var expectedMessage =
@@ -50,11 +54,13 @@
         /// Tests that when invalid values are piped they throw <see cref="ParameterBindingException"/>.
         /// </summary>
         /// <param name="value">The value.</param>
-        [Theory]
+        [SkippableTheory]
         [InlineData("Four")]
         [InlineData(1)]
         public void Test_WhenInvalidValuesArePiped_ThenParameterBindingExceptionIsThrown(object value)
         {
+            Skip.IfNot(Constants.IsWindows);
+
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidateSetFromPipeline, value);
 
             action.Should().Throw<ParameterBindingException>();
@@ -122,9 +128,11 @@
         /// <summary>
         /// Tests that when poco with invalid property value is piped it throws <see cref="ParameterBindingException"/>.
         /// </summary>
-        [Fact]
+        [SkippableFact]
         public void Test_WhenPocoWithInvalidPropertyValueIsPiped_ThenParameterBindingExceptionIsThrown()
         {
+            Skip.IfNot(Constants.IsWindows);
+
             const string InvalidValue = "Four";
 
             var poco = new TestPoco(InvalidValue);

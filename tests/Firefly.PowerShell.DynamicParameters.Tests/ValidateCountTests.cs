@@ -41,11 +41,13 @@
         /// </summary>
         /// <param name="arrayLength">Length of the array.</param>
         /// <seealso cref="Constants.ValidCounts"/>
-        [Theory]
+        [SkippableTheory]
         [InlineData(2)]
         [InlineData(5)]
         public void Test_WhenArrayLengthIsOutsideCountValidation_ThenParameterBindingExceptionIsThrown(int arrayLength)
         {
+            Skip.IfNot(Constants.IsWindows);
+
             var testArray = new string[arrayLength];
 
             for (var i = 0; i < arrayLength; ++i)

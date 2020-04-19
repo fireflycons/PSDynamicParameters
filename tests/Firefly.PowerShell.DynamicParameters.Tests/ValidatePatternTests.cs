@@ -19,7 +19,7 @@
         /// Tests the when invalid IP addresses are passed to parameter with IP validation regex then parameter binding exception is thrown.
         /// </summary>
         /// <param name="ipAddress">The IP address.</param>
-        [Theory]
+        [SkippableTheory]
         [InlineData("256.0.0.0")]
         [InlineData("192.168.0.256")]
         [InlineData("8.8.256.8")]
@@ -27,6 +27,8 @@
             Test_WhenInvalidIPAddressesArePassedToParameterWithIPValidationRegexObject_ThenParameterBindingExceptionIsThrown(
                 string ipAddress)
         {
+            Skip.IfNot(Constants.IsWindows);
+
             var expectedMessage =
                 $"Cannot validate argument on parameter 'TestParameter'. The argument \"{ipAddress}\" does not match the \"{Constants.IpAddressRegex}\" pattern. Supply an argument that matches \"{Constants.IpAddressRegex}\" and try the command again.";
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidatePatternWithRegexObject, ipAddress);
@@ -38,7 +40,7 @@
         /// Tests the when invalid IP addresses are passed to parameter with IP validation regex then parameter binding exception is thrown.
         /// </summary>
         /// <param name="ipAddress">The IP address.</param>
-        [Theory]
+        [SkippableTheory]
         [InlineData("256.0.0.0")]
         [InlineData("192.168.0.256")]
         [InlineData("8.8.256.8")]
@@ -46,6 +48,8 @@
             Test_WhenInvalidIPAddressesArePassedToParameterWithIPValidationRegex_ThenParameterBindingExceptionIsThrown(
                 string ipAddress)
         {
+            Skip.IfNot(Constants.IsWindows);
+
             var expectedMessage =
                 $"Cannot validate argument on parameter 'TestParameter'. The argument \"{ipAddress}\" does not match the \"{Constants.IpAddressRegex}\" pattern. Supply an argument that matches \"{Constants.IpAddressRegex}\" and try the command again.";
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidatePatternViaArguments, ipAddress);
@@ -57,12 +61,14 @@
         /// Tests the when valid IP addresses are passed to parameter with IP validation regex they are returned.
         /// </summary>
         /// <param name="ipAddress">The IP address.</param>
-        [Theory]
+        [SkippableTheory]
         [InlineData("10.0.0.0")]
         [InlineData("192.168.0.23")]
         [InlineData("8.8.8.8")]
         public void Test_WhenValidIPAddressesArePassedToParameterWithIPValidationRegex_TheyAreReturned(string ipAddress)
         {
+            Skip.IfNot(Constants.IsWindows);
+
             var result = TestCmdletHost.RunTestHost(TestCases.ValidatePatternViaArguments, ipAddress);
 
             result.Count.Should().Be(1, "a single value was passed to the dynamic parameter");
@@ -92,10 +98,12 @@
         /// <summary>
         /// Tests the when value does not match case sensitive regex then parameter binding exception is thrown.
         /// </summary>
-        [Fact]
+        [SkippableFact]
         public void
             Test_WhenValueDoesNotMatchCaseSensitiveRegex_ThenParameterBindingExceptionIsThrown()
         {
+            Skip.IfNot(Constants.IsWindows);
+
             const string TestValue = "ABC";
 
             var expectedMessage =
@@ -109,10 +117,12 @@
         /// <summary>
         /// Tests the when value does not match case sensitive regex then parameter binding exception is thrown.
         /// </summary>
-        [Fact]
+        [SkippableFact]
         public void
             Test_WhenValueDoesNotMatchCaseSensitiveRegexObject_ThenParameterBindingExceptionIsThrown()
         {
+            Skip.IfNot(Constants.IsWindows);
+
             const string TestValue = "ABC";
 
             var expectedMessage =
@@ -130,6 +140,7 @@
         public void
             Test_WhenValueDoesNotMatchCaseSensitiveRegex_ThenNoExceptionIsThrown()
         {
+
             const string TestValue = "ABC";
 
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidatePatterWithOptionsCaseInsensitive, TestValue);
@@ -157,10 +168,12 @@
         /// Tests that when invalid IP addresses are passed to parameter with IP validation regex and a custom error message is set,
         /// then parameter binding exception is thrown with the custom message.
         /// </summary>
-        [Fact]
+        [SkippableFact]
         public void
             Test_WhenInvalidIPAddressesArePassedToParameterWithIPValidationRegexAndCustomErrorMessage_ThenParameterBindingExceptionIsThrownWithCustomMessage()
         {
+            Skip.IfNot(Constants.IsWindows);
+
             const string IpAddress = "256.0.0.0";
             var customError = string.Format(Constants.InvalidIpAddressCustomMessage, IpAddress);
             var expectedMessage =
