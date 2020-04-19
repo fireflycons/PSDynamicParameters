@@ -181,8 +181,15 @@
                     powershell.AddParameter("TestValue", dynamicParameterValue);
                 }
 
-                // All objects emitted to pipeline by executing PowerShell code are collected
-                result = powershell.Invoke();
+                try
+                {
+                    // All objects emitted to pipeline by executing PowerShell code are collected
+                    result = powershell.Invoke();
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"Caught {e.GetType().Name} when calling Invoke");
+                }
 
                 try
                 {
