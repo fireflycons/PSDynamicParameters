@@ -8,6 +8,8 @@
 
     using Firefly.PowerShell.DynamicParameters.TestCmdlet;
 
+    using Microsoft.Win32;
+
     /// <summary>
     /// Hosts a PowerShell run space in which to run <see cref="ShowDynamicParameterCommand"/> with various tests.
     /// </summary>
@@ -184,7 +186,7 @@
                 // All objects emitted to pipeline by executing PowerShell code are collected
                 result = powershell.Invoke();
 
-                try
+                if (powershell.HadErrors)
                 {
                     // Get first exception from script, if any
                     var errorRecord = powershell.Streams.Error.FirstOrDefault();
@@ -193,13 +195,14 @@
                     {
                         throw errorRecord.Exception;
                     }
+                    
+                    if (powershell.InvocationStateInfo.Reason != null)
+                    {
+                        throw powershell.InvocationStateInfo.Reason;
+                    }
+                    
+                    throw new Exception("Unknown exception in PowerShell host");
                 }
-                catch (PlatformNotSupportedException e)
-                {
-                    throw new Exception(
-                        $"Caught PlatformNotSupportedException\n{e.StackTrace}`n======================================");
-                }
-
             }
 
             return result;
