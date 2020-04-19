@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 
 var target = Argument("target", "Default");
+var configuration = Argument("configuration", "Release");
 var serveDocs = Argument<bool>("serveDocs", false);
 var isAppveyor = EnvironmentVariable("APPVEYOR") != null;
 var isReleasePublication = isAppveyor && EnvironmentVariable("APPVEYOR_REPO_BRANCH") == "master" && EnvironmentVariable("APPVEYOR_REPO_TAG ") == "true";
@@ -21,7 +22,7 @@ Task("BuildOnWindows")
 
         DotNetCoreBuild("../Firefly.PowerShell.DynamicParameters.sln", new DotNetCoreBuildSettings
         {
-            Configuration = "Release"
+            Configuration = configuration
         });
     });
 
@@ -35,7 +36,7 @@ Task("BuildOnLinux")
 
             DotNetCoreBuild("../Firefly.PowerShell.DynamicParameters.sln", new DotNetCoreBuildSettings
             {
-                Configuration = "Release",
+                Configuration = configuration,
                 Framework = framework
             });
         }
@@ -54,7 +55,7 @@ Task("TestOnWindows")
         {
             DotNetCoreTest("../tests/Firefly.PowerShell.DynamicParameters.Tests/Firefly.PowerShell.DynamicParameters.Tests.csproj", new DotNetCoreTestSettings
             {
-                Configuration = "Release",
+                Configuration = configuration,
                 NoBuild = true,
                 Logger = "trx",
                 ResultsDirectory = testResultsDir
@@ -78,7 +79,7 @@ Task("TestOnLinux")
 
                 DotNetCoreTest("../tests/Firefly.PowerShell.DynamicParameters.Tests/Firefly.PowerShell.DynamicParameters.Tests.csproj", new DotNetCoreTestSettings
                 {
-                    Configuration = "Release",
+                    Configuration = configuration,
                     NoBuild = true,
                     Framework = framework,
                     Logger = "trx",
