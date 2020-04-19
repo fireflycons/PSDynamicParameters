@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.ObjectModel;
-    using System.IO;
+    using System.Runtime.InteropServices;
     using System.Linq;
     using System.Management.Automation;
 
@@ -111,6 +111,11 @@
         /// </summary>
         private static readonly string CmdletModulePath = typeof(ShowDynamicParameterCommand).Assembly.Location;
 
+#if NETCOREAPP
+        private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+#else
+        private static readonly bool IsWindows = true;
+#endif
         /// <summary>
         /// Runs the <see cref="ShowDynamicParameterCommand"/> with arguments for test and collects results
         /// </summary>
@@ -133,7 +138,7 @@
                     case TestCases.ValidatePatternFromPipeline:
                     case TestCases.ValidateSetFromPipeline:
                     case TestCases.ValidateSetFromPipelineByPropertyName:
-                        
+
                         testScript = string.Format(ValueInPipelineScript, CmdletModulePath, (int)testNumber);
                         break;
 
@@ -169,7 +174,7 @@
 
                         testScript = string.Format(ValueAsArgumentScript, CmdletModulePath, (int)testNumber);
                         break;
-                }       
+                }
 
                 powershell.AddScript(testScript);
 
@@ -192,8 +197,9 @@
                         throw errorRecord.Exception;
                     }
 
-                    // Else errors from the host if any
-                    if (powershell.InvocationStateInfo.Reason != null)
+
+                    // Else errors from the host if any. This property not present in Linux
+                    if (IsWindows && powershell.InvocationStateInfo.Reason != null)
                     {
                         throw new CmdletInvocationException(powershell.InvocationStateInfo.Reason.Message);
                     }
