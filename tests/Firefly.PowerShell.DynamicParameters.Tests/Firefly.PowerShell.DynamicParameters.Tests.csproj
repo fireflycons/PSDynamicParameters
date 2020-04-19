@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <TargetFrameworks>net452;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
-
     <IsPackable>false</IsPackable>
+    <IsWindows>$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::get_Windows())))</IsWindows>
+    <DefineConstants Condition=" '$(IsWindows)' == 'true' ">$(DefineConstants);WINDOWS</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

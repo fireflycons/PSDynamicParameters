@@ -182,7 +182,9 @@
 
                 // All objects emitted to pipeline by executing PowerShell code are collected
                 result = powershell.Invoke();
-
+#if WINDOWS
+                // Due to https://github.com/PowerShell/PowerShell/issues/12383,
+                // we cannot detect, and therefore test for exceptions
                 if (powershell.HadErrors)
                 {
                     // Get first exception from script, if any
@@ -200,6 +202,7 @@
 
                     throw new Exception("Unknown exception in PowerShell host");
                 }
+#endif
             }
 
             return result;
