@@ -19,13 +19,11 @@
         /// Tests that when value is out of range then parameter binding exception is thrown.
         /// </summary>
         /// <param name="value">The value.</param>
-        [SkippableTheory]
+        [Theory]
         [InlineData(3)]
         [InlineData(9)]
         public void Test_WhenValueIsOutOfRange_ThenParameterBindingExceptionIsThrown(int value)
         {
-            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
-
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidateRangeWithMinMax, value);
 
             action.Should().Throw<ParameterBindingException>();
@@ -74,13 +72,11 @@
         /// Tests that when value is out of range then parameter binding exception is thrown.
         /// </summary>
         /// <param name="value">The value.</param>
-        [SkippableTheory]
+        [Theory]
         [InlineData(-1)]
         [InlineData(int.MinValue)]
         public void Test_WhenValueIsOutOfRangeKind_ThenParameterBindingExceptionIsThrown(int value)
         {
-            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
-
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidateRangeWithRangeKindNonNegative, value);
 
             action.Should().Throw<ParameterBindingException>();

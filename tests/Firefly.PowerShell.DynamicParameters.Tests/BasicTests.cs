@@ -74,11 +74,9 @@ namespace Firefly.PowerShell.DynamicParameters.Tests
         /// <summary>
         /// Tests the when scalar value is given and double is the type and non numeric passed then parameter binding exception is thrown.
         /// </summary>
-        [SkippableFact]
+        [Fact]
         public void Test_WhenScalarValueIsGivenAndDoubleIsTheTypeAndNonNumericPassed_ThenParameterBindingExceptionIsThrown()
         {
-            Skip.IfNot(Constants.IsWindows, Constants.SkipReason);
-
             var expectedMessage =
                 "Cannot bind parameter 'TestParameter'. Cannot convert value \"string\" to type \"System.Double\". Error: \"Input string was not in a correct format.\"";
 
