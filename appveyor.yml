@@ -13,8 +13,6 @@ image:
 install:
   - ps: ./build/install.ps1
 
-# Skip on updates to the readme.
-# We can force this by adding [skip ci] or [ci skip] anywhere in commit message
 skip_commits:
   message: /NO_CI.*|updated readme.*|update readme.*s/
 
@@ -22,7 +20,7 @@ before_build:
   - ps: ./build/pre-build.ps1
 
 build_script:
-  - ps: ./build/build.ps1 -Configuration Debug
+  - ps: ./build/build.ps1
 
 test: off
 
