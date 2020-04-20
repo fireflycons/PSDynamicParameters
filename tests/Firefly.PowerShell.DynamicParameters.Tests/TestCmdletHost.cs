@@ -22,7 +22,11 @@
                 $TestValue
             )
 
-            Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            if ($PSEdition -eq 'Desktop' -or $IsWindows)
+            {{
+                Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            }}
+
             Import-Module '{0}'
             Show-DynamicParameter -TestNumber {1} -{2} $TestValue
         ";
@@ -37,7 +41,11 @@
                 $TestValue
             )
 
-            Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            if ($PSEdition -eq 'Desktop' -or $IsWindows)
+            {{
+                Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            }}
+
             Import-Module '{0}'
             Show-DynamicParameter -TestNumber {1} -TestParameter $null
         ";
@@ -47,7 +55,11 @@
         /// </summary>
         private const string ParameterSetScript = @"
 
-            Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            if ($PSEdition -eq 'Desktop' -or $IsWindows)
+            {{
+                Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            }}
+
             Import-Module '{0}'
             Show-DynamicParameter -TestNumber {1} {2} {3}
         ";
@@ -62,7 +74,11 @@
                 $TestValue
             )
 
-            Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            if ($PSEdition -eq 'Desktop' -or $IsWindows)
+            {{
+                Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            }}
+
             Import-Module '{0}'
             Show-DynamicParameter -TestNumber {1} $TestValue
         ";
@@ -77,7 +93,11 @@
                 $TestValue
             )
 
-            Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            if ($PSEdition -eq 'Desktop' -or $IsWindows)
+            {{
+                Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            }}
+
             Import-Module '{0}'
 
             if ($null -ne $TestValue)
@@ -100,7 +120,11 @@
                 $TestValue
             )
 
-            Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            if ($PSEdition -eq 'Desktop' -or $IsWindows)
+            {{
+                Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force
+            }}
+
             Import-Module '{0}'
             $TestValue | Show-DynamicParameter -TestNumber {1}
         ";
@@ -182,9 +206,7 @@
 
                 // All objects emitted to pipeline by executing PowerShell code are collected
                 result = powershell.Invoke();
-#if WINDOWS
-                // Due to https://github.com/PowerShell/PowerShell/issues/12383,
-                // we cannot detect, and therefore test for exceptions
+
                 if (powershell.HadErrors)
                 {
                     // Get first exception from script, if any
@@ -195,6 +217,7 @@
                         throw errorRecord.Exception;
                     }
 
+                    // Exception in the host itself
                     if (powershell.InvocationStateInfo.Reason != null)
                     {
                         throw powershell.InvocationStateInfo.Reason;
@@ -202,7 +225,7 @@
 
                     throw new Exception("Unknown exception in PowerShell host");
                 }
-#endif
+
             }
 
             return result;
