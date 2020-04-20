@@ -13,13 +13,9 @@ This library handles the second case above. By implementing a builder pattern to
 
 The nuget package contains the following builds
 
-* .NET 4.0 - Windows PowerShell 5.1
-* NETCORE 2.1 - PowerShell Core 6
-* NETCORE 3.1 - PowerShell Core 7
-
-Currently this can only be verified with tests on Windows due to [this issue](https://github.com/PowerShell/PowerShell/issues/12383) I found while running the tests on Ubuntu. However, the test cmdlet does execute and produce results and thus hand-rolled binary cmdlets built with this library _should_ still work on Linux. It is only the collection of exceptions from the embedded PowerShell host that doesn't work.
-
-As a result, only tests that are not expected to throw exceptions are executed on the Linux build agent.
+* .NET Framework 4.0 - Windows PowerShell 5.1
+* .NET Core 2.1 - PowerShell Core 6 (Windows and Linux)
+* .NET Core 3.1 - PowerShell Core 7 (Windows and Linux)
 
 ## Library Documentation
 
