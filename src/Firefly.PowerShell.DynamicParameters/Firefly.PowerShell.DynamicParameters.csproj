@@ -3,11 +3,18 @@
   <PropertyGroup>
     <TargetFrameworks>net40;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>This library facilittates the creation of dynamic parameters for PowerShell cmdllets written in .NET
+    <Description>This library facilitates the creation of dynamic parameters for PowerShell cmdllets written in .NET
 </Description>
     <Copyright>Copyright (c) 2020 Firefly Consulting Ltd.</Copyright>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/fireflycons/PSDynamicParameters</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fireflycons/PSDynamicParameters.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>PowerShell;Cmdlet;Dynamic;Parameters</PackageTags>
+    <Authors>Alistair Mackay</Authors>
+    <Company>Firefly IT Consulting</Company>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
