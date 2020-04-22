@@ -35,6 +35,8 @@ if ($isAppVeyor)
         [System.IO.File]::WriteAllText($filename, $globalJson, [System.Text.Encoding]::ASCII)
         Write-Host "- Wrote $filename"
     }
+
+    Get-Content env:APPVEYOR*
 }
 
 if ($PSEdition -eq 'Core')
