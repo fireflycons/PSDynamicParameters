@@ -36,7 +36,7 @@ if ($isAppVeyor)
         Write-Host "- Wrote $filename"
     }
 
-    Get-Content env:APPVEYOR*
+    Get-Content env:APPVEYOR*  | % { "$($_.Name) = $($_.Value)" }
 }
 
 if ($PSEdition -eq 'Core')
