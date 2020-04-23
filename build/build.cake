@@ -1,20 +1,79 @@
 #addin nuget:?package=Newtonsoft.Json&version=12.0.3
+#addin nuget:?package=Cake.PowerShell&version=0.4.8
 
+using System.Diagnostics;
 using System.Net;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Diagnostics;
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var serveDocs = Argument<bool>("serveDocs", false);
-var isAppveyor = EnvironmentVariable("APPVEYOR") != null;
-var isReleasePublication = isAppveyor && EnvironmentVariable("APPVEYOR_REPO_BRANCH") == "master" && EnvironmentVariable("APPVEYOR_REPO_TAG ") == "true";
+
+var isAppveyor = EnvironmentVariable<bool>("APPVEYOR", false);
+var projectRoot = Directory(EnvironmentVariable<string>("APPVEYOR_BUILD_FOLDER", ".."));
+var isReleasePublication = isAppveyor && EnvironmentVariable("APPVEYOR_REPO_BRANCH") == "master" && EnvironmentVariable<bool>("APPVEYOR_REPO_TAG", false);
 var canPublishDocs = isAppveyor && EnvironmentVariable<string>("APPVEYOR_REPO_NAME", "none").StartsWith("fireflycons/");
-var docFxConfig = File("../docfx/docfx.json");
+var docFxConfig = projectRoot + File("docfx/docfx.json");
 var testResultsDir = Directory(EnvironmentVariable<string>("APPVEYOR_BUILD_FOLDER", "..")) + Directory("test-output");
 
+FilePath mainProjectFile;
+FilePath nugetPackagePath;
+bool buildPackage;
+string buildVersion;
+
 DirectoryPath docFxSite;
+
+Task("Init")
+    .Does(() => {
+
+        buildVersion = GetBuildVersion();
+
+        foreach(var projectFile in GetFiles(projectRoot + File("**/*.csproj")))
+        {
+            var project = XElement.Load(projectFile.ToString());
+
+            var packElem = project.Elements("PropertyGroup").Descendants("GeneratePackageOnBuild").FirstOrDefault();
+
+            if (packElem != null)
+            {
+                mainProjectFile = MakeAbsolute(File(projectFile.ToString()));
+                bool.TryParse(packElem.Value, out buildPackage);
+            }
+        }
+
+        if (mainProjectFile == null)
+        {
+            throw new CakeException("Unable to locate main project file (i.e. the one that will create the nuget package)");
+        }
+
+        if (buildPackage)
+        {
+            nugetPackagePath = mainProjectFile.GetDirectory()
+                .Combine(Directory($"bin/{configuration}"))
+                + File($"/{mainProjectFile.GetFilenameWithoutExtension()}.{buildVersion}.nupkg");
+
+            Information($"Package: {nugetPackagePath}");
+        }
+    });
+
+Task("PrepareNugetProperties")
+    .WithCriteria(IsRunningOnWindows())
+    .Does(() => {
+
+        var project = XElement.Load(mainProjectFile.ToString());
+        var version = project.Elements("PropertyGroup").Descendants("Version").FirstOrDefault();
+
+        if (version != null)
+        {
+            version.Value = buildVersion;
+            project.Save(mainProjectFile.ToString());
+        }
+    });
 
 Task("BuildOnWindows")
     .WithCriteria(IsRunningOnWindows())
@@ -41,11 +100,6 @@ Task("BuildOnLinux")
             });
         }
     });
-
-Task("Build")
-    .IsDependentOn("BuildOnWindows")
-    .IsDependentOn("BuildOnLinux");
-
 
 Task("TestOnWindows")
     .WithCriteria(IsRunningOnWindows())
@@ -93,10 +147,6 @@ Task("TestOnLinux")
         }
     });
 
-Task("Test")
-    .IsDependentOn("TestOnWindows")
-    .IsDependentOn("TestOnLinux");
-
 Task("CompileDocumentation")
     .WithCriteria(IsRunningOnWindows())
     .Does(() => {
@@ -140,17 +190,72 @@ Task("CopyDocumentationTo-github.io-clone")
         CopyDirectory(docFxSite, outputDir);
     });
 
+Task("PushAppveyor")
+    .WithCriteria(IsRunningOnWindows())
+    .WithCriteria(isAppveyor)
+    .Does(() => {
+
+        var packages = GetFiles($"../**/*.nupkg");
+
+        // Push AppVeyor artifact
+        Information($"Pushing {nugetPackagePath} as AppVeyor artifact");
+
+        StartPowershellScript("Push-AppveyorArtifact", new PowershellSettings
+            {
+                Modules = new List<string> {
+                    "build-worker-api"
+                },
+
+                FormatOutput = true,
+                LogOutput = true
+            }
+            .WithArguments(args =>
+            {
+                args.AppendQuoted(nugetPackagePath.ToString());
+            })
+        );
+    });
+
+Task("PushNuget")
+    .WithCriteria(isAppveyor)
+    .WithCriteria(isReleasePublication)
+    .WithCriteria(IsRunningOnWindows())
+    .Does(() => {
+
+        NuGetPush(nugetPackagePath, new NuGetPushSettings {
+                Source = "https://api.nuget.org/v3/index.json",
+                ApiKey = EnvironmentVariable("NUGET_API_KEY")
+            });
+    });
+
+Task("Build")
+    .IsDependentOn("Init")
+    .IsDependentOn("PrepareNugetProperties")
+    .IsDependentOn("BuildOnWindows")
+    .IsDependentOn("BuildOnLinux");
+
+Task("Test")
+    .IsDependentOn("Init")
+    .IsDependentOn("TestOnWindows")
+    .IsDependentOn("TestOnLinux");
+
+Task("PushPackage")
+    .IsDependentOn("Init")
+    .IsDependentOn("PushAppveyor")
+    .IsDependentOn("PushNuget");
+
 Task("BuildDocumentation")
+    .IsDependentOn("Init")
     .IsDependentOn("CompileDocumentation")
     .IsDependentOn("CopyDocumentationTo-github.io-clone");
 
 Task("Default")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
-    .IsDependentOn("BuildDocumentation");
+    .IsDependentOn("BuildDocumentation")
+    .IsDependentOn("PushPackage");
 
 RunTarget(target);
-
 
 #region Helper Functions
 
@@ -180,6 +285,25 @@ string EnvironmentVariableStrict(string name)
     }
 
     return val;
+}
+
+string GetBuildVersion()
+{
+    var tag = EnvironmentVariable("APPVEYOR_REPO_TAG_NAME");
+
+    if (tag == null)
+    {
+        return EnvironmentVariable<string>("APPVEYOR_BUILD_VERSION", "0.0.1");;
+    }
+
+    var m = Regex.Match(tag, @"^v(?<version>\d+\.\d+\.\d+)$", RegexOptions.IgnoreCase);
+
+    if (m.Success)
+    {
+        return m.Groups["version"].Value;
+    }
+
+    throw new CakeException($"Cannot determine version from tag: {tag}");
 }
 
 void RunDocFX(FilePath config, bool serve)
