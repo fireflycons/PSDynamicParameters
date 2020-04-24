@@ -266,6 +266,11 @@ class AppveyorArtifactRequest
 
 void UploadAppVeyorArtifact(FilePath artifact)
 {
+    if (!FileExists(artifact))
+    {
+        throw new FileNotFoundException(artifact.ToString());
+    }
+
     var ub = new UriBuilder(EnvironmentVariableStrict("APPVEYOR_API_URL"));
 
     ub.Path = "/api/artifacts";
