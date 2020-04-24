@@ -1,9 +1,10 @@
 #addin nuget:?package=Newtonsoft.Json&version=12.0.3
-#addin nuget:?package=Cake.PowerShell&version=0.4.8
+#addin nuget:?package=Cake.Http&version=0.7.0
 
 using System.Diagnostics;
 using System.Net;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -200,20 +201,7 @@ Task("PushAppveyor")
         // Push AppVeyor artifact
         Information($"Pushing {nugetPackagePath} as AppVeyor artifact");
 
-        StartPowershellScript("Push-AppveyorArtifact", new PowershellSettings
-            {
-                Modules = new List<string> {
-                    "build-worker-api"
-                },
-
-                FormatOutput = true,
-                LogOutput = true
-            }
-            .WithArguments(args =>
-            {
-                args.AppendQuoted(nugetPackagePath.ToString());
-            })
-        );
+        UploadAppVeyorArtifact(nugetPackagePath);
     });
 
 Task("PushNuget")
@@ -259,6 +247,36 @@ RunTarget(target);
 
 #region Helper Functions
 
+class AppveyorArtifactRequest
+{
+    public AppveyorArtifactRequest(FilePath artifact)
+    {
+        this.path = artifact.ToString();
+        this.fileName = artifact.GetFilename().ToString();
+    }
+
+    public string path { get; }
+
+    public string fileName { get; }
+
+    public string name { get; } = null;
+
+    public string type { get; } = "NuGetPackage";
+}
+
+void UploadAppVeyorArtifact(FilePath artifact)
+{
+    var response = HttpPost(EnvironmentVariableStrict("APPVEYOR_API_URL"), new HttpSettings {
+        RequestBody = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact))),
+        Headers = new Dictionary<string, string> {
+            { "Accept", "application/json" }
+        },
+        EnsureSuccessStatusCode = true
+    });
+
+    Information(response);
+}
+
 void UploadTestResults()
 {
     if (!isAppveyor)
@@ -274,6 +292,7 @@ void UploadTestResults()
         }
     }
 }
+
 
 string EnvironmentVariableStrict(string name)
 {
