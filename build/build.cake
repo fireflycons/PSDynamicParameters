@@ -267,10 +267,17 @@ class AppveyorArtifactRequest
 void UploadAppVeyorArtifact(FilePath artifact)
 {
     var settings  = new HttpSettings();
+    var req = JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact));
 
-    settings.SetRequestBody(JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact)));
+    Information(req);
+    settings.SetRequestBody(req);
 
     var response = HttpPost(EnvironmentVariableStrict("APPVEYOR_API_URL"), settings);
+
+    if (string.IsNullOrWhiteSpace(response))
+    {
+        throw new CakeException("No response from API");
+    }
 
     Information(response);
 }
