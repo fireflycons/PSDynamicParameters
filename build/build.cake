@@ -266,13 +266,12 @@ class AppveyorArtifactRequest
 
 void UploadAppVeyorArtifact(FilePath artifact)
 {
-    var settings  = new HttpSettings();
-    var req = JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact));
+    var ub = new UriBuilder(EnvironmentVariableStrict("APPVEYOR_API_URL"));
 
-    Information(req);
-    settings.SetRequestBody(req);
+    ub.Path = "/api/artifacts";
 
-    var response = HttpPost(EnvironmentVariableStrict("APPVEYOR_API_URL"), settings);
+    var settings  = new HttpSettings().SetRequestBody(JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact)));
+    var response = HttpPost(ub.Uri.ToString(), settings);
 
     if (string.IsNullOrWhiteSpace(response))
     {
