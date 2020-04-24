@@ -266,13 +266,11 @@ class AppveyorArtifactRequest
 
 void UploadAppVeyorArtifact(FilePath artifact)
 {
-    var response = HttpPost(EnvironmentVariableStrict("APPVEYOR_API_URL"), new HttpSettings {
-        RequestBody = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact))),
-        Headers = new Dictionary<string, string> {
-            { "Accept", "application/json" }
-        },
-        EnsureSuccessStatusCode = true
-    });
+    var settings  = new HttpSettings();
+
+    settings.SetRequestBody(JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact)));
+
+    var response = HttpPost(EnvironmentVariableStrict("APPVEYOR_API_URL"), settings);
 
     Information(response);
 }
