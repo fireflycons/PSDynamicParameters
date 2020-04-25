@@ -252,17 +252,30 @@ class AppveyorArtifactRequest
 {
     public AppveyorArtifactRequest(FilePath artifact)
     {
-        this.path = artifact.ToString();
-        this.fileName = artifact.GetFilename().ToString();
+        this.Path = artifact.ToString();
+        this.FileName = artifact.GetFilename().ToString();
     }
 
-    public string path { get; }
+    [JsonProperty("path")]
+    public string Path { get; }
 
-    public string fileName { get; }
+    [JsonProperty("fileName")]
+    public string FileName { get; }
 
-    public string name { get; } = null;
+    [JsonProperty("name")]
+    public string Name { get; } = null;
 
-    public string type { get; } = "NuGetPackage";
+    [JsonProperty("type")]
+    public string Type { get; } = "NuGetPackage";
+}
+
+class AppveyorArtifactResponse
+{
+    [JsonProperty("uploadUrl")]
+    public string UploadUrl { get; set; }
+
+    [JsonProperty("storageType")]
+    public string StorageType { get; set; }
 }
 
 async Task UploadAppVeyorArtifact(FilePath artifact)
@@ -281,17 +294,33 @@ async Task UploadAppVeyorArtifact(FilePath artifact)
 
     using (var client = new HttpClient())
     {
-        var response = await client.PostAsync(ub.Uri, data);
-
-        string result = response.Content.ReadAsStringAsync().Result;
+        string result = (await client.PostAsync(ub.Uri, data)).Content.ReadAsStringAsync().Result;
 
         if (string.IsNullOrWhiteSpace(result))
         {
             throw new CakeException("No response from API");
         }
 
-        Information(result);
+        var uploadDetails = JsonConvert.DeserializeObject<AppveyorArtifactResponse>(result);
+
+        switch(uploadDetails.StorageType)
+        {
+            case "Azure":
+
+                using (var wc = new WebClient())
+                {
+                    wc.UploadFile(uploadDetails.UploadUrl, artifact.ToString());
+                }
+
+                break;
+
+            default:
+
+                throw new CakeException ($"Unsupported storage Type: {uploadDetails.StorageType}");
+        }
     }
+
+    Information($"Uploaded '{artifact}' to Appveyor");
 }
 
 void UploadTestResults()
