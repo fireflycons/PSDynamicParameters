@@ -1,5 +1,4 @@
 #addin nuget:?package=Newtonsoft.Json&version=12.0.3
-#addin nuget:?package=Cake.Http&version=0.7.0
 
 using System.Diagnostics;
 using System.Net;
@@ -10,6 +9,8 @@ using System.Xml.Linq;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
@@ -194,14 +195,14 @@ Task("CopyDocumentationTo-github.io-clone")
 Task("PushAppveyor")
     .WithCriteria(IsRunningOnWindows())
     .WithCriteria(isAppveyor)
-    .Does(() => {
+    .Does(async () => {
 
         var packages = GetFiles($"../**/*.nupkg");
 
         // Push AppVeyor artifact
         Information($"Pushing {nugetPackagePath} as AppVeyor artifact");
 
-        UploadAppVeyorArtifact(nugetPackagePath);
+        await UploadAppVeyorArtifact(nugetPackagePath);
     });
 
 Task("PushNuget")
@@ -264,7 +265,7 @@ class AppveyorArtifactRequest
     public string type { get; } = "NuGetPackage";
 }
 
-void UploadAppVeyorArtifact(FilePath artifact)
+async Task UploadAppVeyorArtifact(FilePath artifact)
 {
     if (!FileExists(artifact))
     {
@@ -275,15 +276,22 @@ void UploadAppVeyorArtifact(FilePath artifact)
 
     ub.Path = "/api/artifacts";
 
-    var settings  = new HttpSettings().SetRequestBody(JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact)));
-    var response = HttpPost(ub.Uri.ToString(), settings);
+    var json = JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact));
+    var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-    if (string.IsNullOrWhiteSpace(response))
+    using (var client = new HttpClient())
     {
-        throw new CakeException("No response from API");
-    }
+        var response = await client.PostAsync(ub.Uri, data);
 
-    Information(response);
+        string result = response.Content.ReadAsStringAsync().Result;
+
+        if (string.IsNullOrWhiteSpace(result))
+        {
+            throw new CakeException("No response from API");
+        }
+
+        Information(result);
+    }
 }
 
 void UploadTestResults()
