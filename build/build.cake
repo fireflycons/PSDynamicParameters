@@ -309,6 +309,7 @@ async Task UploadAppVeyorArtifact(FilePath artifact)
 
                 using (var wc = new WebClient())
                 {
+                    Information($"Upload to {uploadDetails.UploadUrl}");
                     wc.UploadFile(uploadDetails.UploadUrl, artifact.ToString());
                 }
 
