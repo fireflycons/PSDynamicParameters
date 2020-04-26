@@ -178,7 +178,7 @@ Task("CompileDocumentation")
 
 Task("CopyDocumentationTo-github.io-clone")
     .WithCriteria(IsRunningOnWindows())
-    .WithCriteria(canPublishDocs)
+    .WithCriteria(isReleasePublication)
     .Does(() => {
 
         var outputDir = MakeAbsolute(Directory(System.IO.Path.Combine(EnvironmentVariableStrict("APPVEYOR_BUILD_FOLDER"), "..", "fireflycons.github.io", "PSDynamicParameters")));

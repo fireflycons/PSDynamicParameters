@@ -15,9 +15,9 @@ if (-not $isAppVeyor)
     return
 }
 
-if (-not $canPublishDocs)
+if (-not ($canPublishDocs -and $isReleasePublication))
 {
-    Write-Host "Cannot publish docs in forked repo"
+    Write-Host "Cannot publish docs in forked repo or if not publishing a release"
     return
 }
 

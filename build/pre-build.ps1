@@ -1,4 +1,6 @@
-$isAppVeyor = $null -ne $env:APPVEYOR
+# Dot-source vars describing environment
+. (Join-Path $PSScriptRoot build-environment.ps1)
+
 
 if ($isAppVeyor)
 {
@@ -48,6 +50,12 @@ if ($PSEdition -eq 'Core')
 if (-not $isAppVeyor)
 {
     Write-Host "Publish docs step not in scope in this environment"
+    return
+}
+
+if (-not $isReleasePublication)
+{
+    Write-Host "Not cloning documentation site as this isn't a publish build"
     return
 }
 
