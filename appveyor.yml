@@ -8,7 +8,7 @@ environment:
 
 image:
   - macos
-#  - Ubuntu
+  - Ubuntu
   - Visual Studio 2019
 
 install:
