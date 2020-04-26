@@ -276,6 +276,30 @@ class AppveyorArtifactResponse
 
     [JsonProperty("storageType")]
     public string StorageType { get; set; }
+
+    [JsonIgnore]
+    public bool IsAzureOrGoogle
+    {
+        get
+        {
+            return this.StorageType == "Azure" || this.UploadUrl.Contains("google");
+        }
+    }
+}
+
+class AppVeyorArtifactFinalization
+{
+    public AppVeyorArtifactFinalization(FilePath artifact)
+    {
+        this.FileName = artifact.GetFilename().ToString();
+        this.Size = new System.IO.FileInfo(artifact.ToString()).Length;
+    }
+
+    [JsonProperty("fileName")]
+    public string FileName { get; }
+
+    [JsonProperty("size")]
+    public long Size { get; }
 }
 
 async Task UploadAppVeyorArtifact(FilePath artifact)
@@ -285,15 +309,19 @@ async Task UploadAppVeyorArtifact(FilePath artifact)
         throw new FileNotFoundException(artifact.ToString());
     }
 
-    var ub = new UriBuilder(EnvironmentVariableStrict("APPVEYOR_API_URL"));
+    var appveyorApi = new UriBuilder(EnvironmentVariableStrict("APPVEYOR_API_URL"));
 
-    ub.Path = "/api/artifacts";
-
-    var json = JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact));
+    appveyorApi.Path = "/api/artifacts";
 
     using (var client = new HttpClient())
     {
-        string result = (await client.PostAsync(ub.Uri, new StringContent(json, Encoding.UTF8, "application/json"))).Content.ReadAsStringAsync().Result;
+        string result = (
+            await client.PostAsync(appveyorApi.Uri, new StringContent(
+                JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact)),
+                Encoding.UTF8, "application/json"
+                )
+            )
+        ).Content.ReadAsStringAsync().Result;
 
         if (string.IsNullOrWhiteSpace(result))
         {
@@ -302,19 +330,23 @@ async Task UploadAppVeyorArtifact(FilePath artifact)
 
         var uploadDetails = JsonConvert.DeserializeObject<AppveyorArtifactResponse>(result);
 
-        switch(uploadDetails.StorageType)
+        if (uploadDetails.IsAzureOrGoogle)
         {
-            case "Azure":
+            using (var data = new StreamContent(System.IO.File.OpenRead(artifact.ToString())))
+            {
+                await client.PutAsync(uploadDetails.UploadUrl, data);
+            }
 
-                using (var data = new StreamContent(System.IO.File.OpenRead(artifact.ToString())))
-                {
-                    await client.PutAsync(uploadDetails.UploadUrl, data);
-                }
-                break;
-
-            default:
-
-                throw new CakeException ($"Unsupported storage Type: {uploadDetails.StorageType}");
+            await client.PostAsync(appveyorApi.Uri, new StringContent(
+                    JsonConvert.SerializeObject(new AppVeyorArtifactFinalization(artifact)),
+                    Encoding.UTF8,
+                    "application/json"
+                    )
+                );
+        }
+        else
+        {
+            throw new CakeException ($"Unsupported storage Type: {uploadDetails.StorageType}");
         }
     }
 
