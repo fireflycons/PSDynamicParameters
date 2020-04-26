@@ -1,6 +1,7 @@
 ﻿namespace Firefly.PowerShell.DynamicParameters.TestCmdlet
 {
     using System.Management.Automation;
+    using System.Runtime.InteropServices;
 
     public static class Constants
     {
@@ -65,6 +66,12 @@
         public const string DynamicParameterSetsSetB = "SetB";
 
         /// <summary>
+        /// Reason for marking exception tests inconclusive in Linux
+        /// </summary>
+        public const string SkipReason =
+            "Cannot test exceptions recorded by embedded PowerShell host on Linux.\nSee https://github.com/PowerShell/PowerShell/issues/12383";
+
+        /// <summary>
         /// Validate Set valid values
         /// </summary>
         public static readonly string[] ValidStrings = { "One", "Two", "Three" };
@@ -89,12 +96,27 @@
         /// </summary>
         public static readonly ScriptBlock ValidateScript = ScriptBlock.Create("$_ -ge 4 -and $_ -le 8");
 
+        /// <summary>
+        /// An array for testing value from remaining arguments
+        /// </summary>
+        public static readonly string[] RemainingArguments = new[] { "-arg1=value1", "-arg2=value2", "three" };
+
 #if NETCOREAPP
+
+        /// <summary>
+        /// <c>true</c>> if tests are running on Windows; else <c>false</c>.
+        /// </summary>
+        public static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
         /// <summary>
         /// A range kind for Validate Range tests
         /// </summary>
         public const ValidateRangeKind ValidRangeKindNonNegative = ValidateRangeKind.NonNegative;
+#else
+        /// <summary>
+        /// Alsways <c>true</c>> as NET Framework is only run on Windows.
+        /// </summary>
+        public const bool IsWindows = true;
 #endif
     }
 }

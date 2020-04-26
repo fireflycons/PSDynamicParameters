@@ -1,0 +1,29 @@
+environment:
+  NUGET_API_KEY:
+    secure: ZwF65Rl156oMAenHhi8BAY0LySWhhjDvNNt91dpU7D5N88E8ToZyZHCziktv7sz3
+  GITHUB_PAT:
+    secure: w8H/kYnxC0NVBLhm4uXSLNH110FtIAQ1COq0Wl5RgwDCG3apzXfSCEfJcwSc44QQ
+  GITHUB_EMAIL:
+    secure: CxOftS/5wmEkPCDl0O/KIiKlF4KhUnGD9436K/1iQwY3RkDMZRCkCEny+dG5zCS+
+
+image:
+  - macos
+  - Ubuntu
+  - Visual Studio 2019
+
+install:
+  - ps: ./build/install.ps1
+
+skip_commits:
+  message: /NO_CI.*|updated readme.*|update readme.*s/
+
+before_build:
+  - ps: ./build/pre-build.ps1
+
+build_script:
+  - ps: ./build/build.ps1
+
+test: off
+
+on_success:
+  - ps: ./build/publish-docs

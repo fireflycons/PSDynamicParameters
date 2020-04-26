@@ -176,6 +176,12 @@
                     dynamicParams.Add(new RuntimeDefinedParameterBuilder(Constants.DynamicParameterSetFirstParameter).WithParameterSets(Constants.DynamicParameterSetsSetA));
                     dynamicParams.Add(new RuntimeDefinedParameterBuilder(Constants.DynamicParameterSetSecondParameter).WithParameterSets(Constants.DynamicParameterSetsSetB));
                     break;
+
+                case TestCases.ValueFromRemainingArguments:
+
+                    dynamicParams.Add(new RuntimeDefinedParameterBuilder(Constants.DynamicParameterName).WithValueFromRemainingArguments());
+                    break;
+
 #if NETCOREAPP
                 // PowerShell Core only
                 case TestCases.ValidateRangeWithRangeKindNonNegative:

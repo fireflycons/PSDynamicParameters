@@ -6,6 +6,8 @@ In this simplified example based on the tests within this repo, we create a para
 [Cmdlet(VerbsCommon.Add, "DynamicParameter")]
 public class AddDynamicParameterCommand : PSCmdlet, IDynamicParameters
 {
+    private const string MyNewParameter = "MyNewParameter";
+
     /// <summary>
     /// Gets or sets the test to run
     /// This is a mandatory fixed parameter to the cmdlet.
@@ -28,9 +30,10 @@ public class AddDynamicParameterCommand : PSCmdlet, IDynamicParameters
             // Add a param "-MyNewParameter" which will be mandatory
             // with allowed values of "Yes" or "No"
             dynamicParams.Add(
-                new DynamicParameterBuilder("MyNewParameter")
+                new DynamicParameterBuilder(MyNewParameter)
                     .WithMandatory()
                     .WithValidateSet("Yes", "No")
+                    .WithHelpMessage("Please answer Yes or No")
                 );
         }
 
@@ -46,10 +49,10 @@ public class AddDynamicParameterCommand : PSCmdlet, IDynamicParameters
         // This is $PSBoundParameters
         var boundParameters = this.MyInvocation.BoundParameters;
 
-        if (boundParameters.ContainsKey("MyNewParameter"))
+        if (boundParameters.ContainsKey(MyNewParameter))
         {
             // The dynamic parameter is present - retrieve its value
-            var myNewParameter = boundParameters["MyNewParameter"];
+            var myNewParameter = boundParameters[MyNewParameter];
 
             // Do something with the parameter...
         }

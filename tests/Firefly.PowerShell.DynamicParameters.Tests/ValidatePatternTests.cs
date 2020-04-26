@@ -130,6 +130,7 @@
         public void
             Test_WhenValueDoesNotMatchCaseSensitiveRegex_ThenNoExceptionIsThrown()
         {
+
             const string TestValue = "ABC";
 
             Action action = () => TestCmdletHost.RunTestHost(TestCases.ValidatePatterWithOptionsCaseInsensitive, TestValue);

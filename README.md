@@ -1,5 +1,7 @@
 # Firefly.PowerShell.DynamicParameters
 
+[![Build status](https://ci.appveyor.com/api/projects/status/a7wi3yhl92wii80u/branch/master?svg=true)](https://ci.appveyor.com/project/fireflycons/psdynamicparameters/branch/master)
+
 A library for the creation of runtime [dynamic parameters](https://docs.microsoft.com/en-gb/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters) for binary cmdlets.
 
 When creating a binary cmdlet, there are two ways that you can declare dynamic parameters:
@@ -13,10 +15,12 @@ This library handles the second case above. By implementing a builder pattern to
 
 The nuget package contains the following builds
 
-* .NET 4.0 - Windows PowerShell 5.1
-* NETCORE 2.1 - PowerShell Core 6
-* NETCORE 3.1 - PowerShell Core 7
+* .NET Framework 4.0 - Windows PowerShell 5.1
+* .NET Core 2.1 - PowerShell Core 6 (Windows/Linux/MacOS)
+* .NET Core 3.1 - PowerShell Core 7 (Windows/Linux/MacOS)
+
+Tests are run on all three platforms for both PowerShell Core versions.
 
 ## Library Documentation
 
-This is located [here](https://fireflycons.github.io/PSDynamicParameters)
+API documentation and example usage can be found [here](https://fireflycons.github.io/PSDynamicParameters).

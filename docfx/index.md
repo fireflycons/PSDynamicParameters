@@ -9,6 +9,9 @@ When creating a cmdlet in e.g. C#, there are two ways that you can declare dynam
 
 This library handles the second case above. By implementing a builder pattern to create new dynamic paramaters, this makes it easy to manage the myriad attributes that may be applied to a cmdlet parameter.
 
+* For example usage see [Articles](./articles/creating.html)
+* For API Documentantion see [API Dcoumentation](./api/index.html)
+
 ## Supported PowerShell Versions
 
 The nuget package contains the following builds

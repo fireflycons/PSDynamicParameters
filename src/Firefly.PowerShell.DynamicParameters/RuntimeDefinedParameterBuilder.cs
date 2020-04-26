@@ -67,6 +67,11 @@
         private bool valueFromPipelineByPropertyName;
 
         /// <summary>
+        /// <c>true</c> if parameter will take value from remaining arguments; else <c>false</c>
+        /// </summary>
+        private bool valueFromRemainingArguments;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeDefinedParameterBuilder"/> class.
         /// The parameter will have a default type of <see cref="object"/>
         /// </summary>
@@ -102,12 +107,13 @@
         /// <returns>A new <see cref="RuntimeDefinedParameter"/></returns>
         public RuntimeDefinedParameter Build()
         {
-            // Define [Parameter] attribute
+            // Define primary [Parameter] attribute
             var paramAttribute = new ParameterAttribute
                                      {
                                          Mandatory = this.mandatory,
                                          ValueFromPipeline = this.valueFromPipeline,
-                                         ValueFromPipelineByPropertyName = this.valueFromPipelineByPropertyName
+                                         ValueFromPipelineByPropertyName = this.valueFromPipelineByPropertyName,
+                                         ValueFromRemainingArguments = this.valueFromRemainingArguments
                                      };
 
             if (this.parameterPosition.HasValue)
@@ -131,7 +137,7 @@
 
             var attributeCollection = new Collection<Attribute> { paramAttribute };
 
-            // Additional parameter sets
+            // Additional parameter sets, declared by adding additional [Parameter] attributes
             if (this.parameterParameterSetNames != null && this.parameterParameterSetNames.Length > 1)
             {
                 foreach (var parameterSetName in this.parameterParameterSetNames.Skip(1))
@@ -191,7 +197,13 @@
         }
 
         /// <summary>
+        /// <para>
         /// Declares a help message describing the parameter usage.
+        /// </para>
+        /// <para>
+        /// When the parameter is mandatory and not provided in interactive mode, the user is queried for the parameter value.
+        /// If "?" is entered, then this help message is displayed.
+        /// </para>
         /// </summary>
         /// <param name="helpMessage">The help message.</param>
         /// <returns>This builder</returns>
@@ -364,6 +376,16 @@
         public RuntimeDefinedParameterBuilder WithValueFromPipelineByPropertyName()
         {
             this.valueFromPipelineByPropertyName = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Declares parameter as taking its value from any remaining arguments.
+        /// </summary>
+        /// <returns>This builder</returns>
+        public RuntimeDefinedParameterBuilder WithValueFromRemainingArguments()
+        {
+            this.valueFromRemainingArguments = true;
             return this;
         }
 
