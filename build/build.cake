@@ -197,12 +197,7 @@ Task("PushAppveyor")
     .WithCriteria(isAppveyor)
     .Does(async () => {
 
-        var packages = GetFiles($"../**/*.nupkg");
-
-        // Push AppVeyor artifact
-        Information($"Pushing {nugetPackagePath} as AppVeyor artifact");
-
-        await UploadAppVeyorArtifact(nugetPackagePath);
+        await UploadAppveyorArtifact(nugetPackagePath);
     });
 
 Task("PushNuget")
@@ -287,9 +282,9 @@ class AppveyorArtifactResponse
     }
 }
 
-class AppVeyorArtifactFinalization
+class AppVeyorArtifactFinalisation
 {
-    public AppVeyorArtifactFinalization(FilePath artifact)
+    public AppVeyorArtifactFinalisation(FilePath artifact)
     {
         this.FileName = artifact.GetFilename().ToString();
         this.Size = new System.IO.FileInfo(artifact.ToString()).Length;
@@ -302,7 +297,7 @@ class AppVeyorArtifactFinalization
     public long Size { get; }
 }
 
-async Task UploadAppVeyorArtifact(FilePath artifact)
+async Task UploadAppveyorArtifact(FilePath artifact)
 {
     if (!FileExists(artifact))
     {
@@ -315,30 +310,35 @@ async Task UploadAppVeyorArtifact(FilePath artifact)
 
     using (var client = new HttpClient())
     {
-        string result = (
-            await client.PostAsync(appveyorApi.Uri, new StringContent(
-                JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact)),
-                Encoding.UTF8, "application/json"
+        var artifactRequest = new AppveyorArtifactRequest(artifact);
+
+        // Request upload URL
+        var uploadDetails = JsonConvert.DeserializeObject<AppveyorArtifactResponse>(
+            (
+                await client.PostAsync(appveyorApi.Uri, new StringContent(
+                    JsonConvert.SerializeObject(artifactRequest),
+                    Encoding.UTF8, "application/json"
+                    )
                 )
             )
-        ).Content.ReadAsStringAsync().Result;
+            .Content
+            .ReadAsStringAsync()
+            .Result
+        );
 
-        if (string.IsNullOrWhiteSpace(result))
-        {
-            throw new CakeException("No response from API");
-        }
-
-        var uploadDetails = JsonConvert.DeserializeObject<AppveyorArtifactResponse>(result);
+        Information($"Uploading Appveyor artifact '{artifactRequest.FileName}' to {uploadDetails.StorageType}");
 
         if (uploadDetails.IsAzureOrGoogle)
         {
+            // PUT to cloud storage
             using (var data = new StreamContent(System.IO.File.OpenRead(artifact.ToString())))
             {
                 await client.PutAsync(uploadDetails.UploadUrl, data);
             }
 
-            await client.PostAsync(appveyorApi.Uri, new StringContent(
-                    JsonConvert.SerializeObject(new AppVeyorArtifactFinalization(artifact)),
+            // Finalise request with Appveyor
+            await client.PutAsync(appveyorApi.Uri, new StringContent(
+                    JsonConvert.SerializeObject(new AppVeyorArtifactFinalisation(artifact)),
                     Encoding.UTF8,
                     "application/json"
                     )
@@ -346,11 +346,13 @@ async Task UploadAppVeyorArtifact(FilePath artifact)
         }
         else
         {
-            throw new CakeException ($"Unsupported storage Type: {uploadDetails.StorageType}");
+            // direct to Appveyor
+            using (var wc = new WebClient())
+            {
+                wc.UploadFile(uploadDetails.UploadUrl, artifact.ToString());
+            }
         }
     }
-
-    Information($"Uploaded '{artifact}' to Appveyor");
 }
 
 void UploadTestResults()
