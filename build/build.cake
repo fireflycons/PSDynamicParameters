@@ -290,11 +290,10 @@ async Task UploadAppVeyorArtifact(FilePath artifact)
     ub.Path = "/api/artifacts";
 
     var json = JsonConvert.SerializeObject(new AppveyorArtifactRequest(artifact));
-    var data = new StringContent(json, Encoding.UTF8, "application/json");
 
     using (var client = new HttpClient())
     {
-        string result = (await client.PostAsync(ub.Uri, data)).Content.ReadAsStringAsync().Result;
+        string result = (await client.PostAsync(ub.Uri, new StringContent(json, Encoding.UTF8, "application/json"))).Content.ReadAsStringAsync().Result;
 
         if (string.IsNullOrWhiteSpace(result))
         {
@@ -307,12 +306,10 @@ async Task UploadAppVeyorArtifact(FilePath artifact)
         {
             case "Azure":
 
-                using (var wc = new WebClient())
+                using (var data = new StreamContent(System.IO.File.OpenRead(artifact.ToString())))
                 {
-                    Information($"Upload to {uploadDetails.UploadUrl}");
-                    wc.UploadFile(uploadDetails.UploadUrl, artifact.ToString());
+                    await client.PutAsync(uploadDetails.UploadUrl, data);
                 }
-
                 break;
 
             default:
