@@ -1,5 +1,6 @@
 #addin nuget:?package=Newtonsoft.Json&version=12.0.3
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Linq;
@@ -26,7 +27,7 @@ var testResultsDir = Directory(EnvironmentVariable<string>("APPVEYOR_BUILD_FOLDE
 FilePath mainProjectFile;
 FilePath nugetPackagePath;
 bool buildPackage;
-string buildVersion;
+Version buildVersion;
 
 DirectoryPath docFxSite;
 
@@ -63,18 +64,21 @@ Task("Init")
         }
     });
 
-Task("PrepareNugetProperties")
+Task("SetAssemblyProperties")
     .WithCriteria(IsRunningOnWindows())
     .Does(() => {
 
+        // Only manipulate the nuget/assembly properties on Windows as it's this run that publishes to nuget.
+        // Other platform builds to run tests only
         var project = XElement.Load(mainProjectFile.ToString());
-        var version = project.Elements("PropertyGroup").Descendants("Version").FirstOrDefault();
 
-        if (version != null)
-        {
-            version.Value = buildVersion;
-            project.Save(mainProjectFile.ToString());
-        }
+        var propertyGroups = project.Elements("PropertyGroup").ToList();
+
+        SetProjectProperty(propertyGroups, "Version", buildVersion.ToString());
+        SetProjectProperty(propertyGroups, "AssemblyVersion", $"{buildVersion.ToString(2)}.0.0");
+        SetProjectProperty(propertyGroups, "FileVersion", $"{buildVersion.ToString(3)}.0");
+
+        project.Save(mainProjectFile.ToString());
     });
 
 Task("BuildOnWindows")
@@ -214,7 +218,7 @@ Task("PushNuget")
 
 Task("Build")
     .IsDependentOn("Init")
-    .IsDependentOn("PrepareNugetProperties")
+    .IsDependentOn("SetAssemblyProperties")
     .IsDependentOn("BuildOnWindows")
     .IsDependentOn("BuildOnLinux");
 
@@ -317,7 +321,8 @@ async Task UploadAppveyorArtifact(FilePath artifact)
             (
                 await client.PostAsync(appveyorApi.Uri, new StringContent(
                     JsonConvert.SerializeObject(artifactRequest),
-                    Encoding.UTF8, "application/json"
+                    Encoding.UTF8,
+                    "application/json"
                     )
                 )
             )
@@ -371,6 +376,19 @@ void UploadTestResults()
     }
 }
 
+void SetProjectProperty(IEnumerable<XElement>properties, string propertyName, string propertyValue)
+{
+    var elem = properties.Descendants(propertyName).FirstOrDefault();
+
+    if (elem != null)
+    {
+        elem.Value = propertyValue;
+    }
+    else
+    {
+        properties.First().Add(new XElement(propertyName, propertyValue));
+    }
+}
 
 string EnvironmentVariableStrict(string name)
 {
@@ -384,20 +402,20 @@ string EnvironmentVariableStrict(string name)
     return val;
 }
 
-string GetBuildVersion()
+Version GetBuildVersion()
 {
     var tag = EnvironmentVariable("APPVEYOR_REPO_TAG_NAME");
 
     if (tag == null)
     {
-        return EnvironmentVariable<string>("APPVEYOR_BUILD_VERSION", "0.0.1");;
+        return new Version(EnvironmentVariable<string>("APPVEYOR_BUILD_VERSION", "0.0.1"));
     }
 
     var m = Regex.Match(tag, @"^v(?<version>\d+\.\d+\.\d+)$", RegexOptions.IgnoreCase);
 
     if (m.Success)
     {
-        return m.Groups["version"].Value;
+        return new Version(m.Groups["version"].Value);
     }
 
     throw new CakeException($"Cannot determine version from tag: {tag}");
