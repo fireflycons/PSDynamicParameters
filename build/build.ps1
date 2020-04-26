@@ -88,15 +88,20 @@ try
 
     Write-Host "Checking operating system..."
     $IsWindowsOS = (-not (Get-Variable -Name IsWindows -ErrorAction Ignore)) -or $IsWindows
-    $IsLinuxOS = (Get-Variable -Name IsLinux -ErrorAction Ignore) -and $IsLinux
 
     if ($IsWindowsOS)
     {
         Write-Host " - Windows"
     }
-    elseif ($IsLinuxOS)
+    elseif ($IsLinux)
     {
         Write-Host " - Linux"
+        $ForceCoreClr = $true
+    }
+    elseif ($IsMacOS)
+    {
+        Write-Host "- MacOS"
+        $ForceCoreClr = $true
     }
     else
     {
@@ -131,7 +136,7 @@ try
     # Will we use dotnet to invoke Cake?
     $DotNet = [string]::Empty
     $DotNetExpression = [string]::Empty
-    if ($IsLinuxOS -or $ForceCoreClr)
+    if ($ForceCoreClr)
     {
         try
         {
