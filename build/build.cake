@@ -95,7 +95,7 @@ Task("BuildOnLinux")
     .WithCriteria(IsRunningOnUnix())
     .Does(() => {
 
-        foreach (var framework in new [] { "netcoreapp2.1", "netcoreapp3.1"})
+        foreach (var framework in new [] { "netstandard2.1,netcoreapp2.1", "netcoreapp3.1"})
         {
             Information($"Building {framework}");
 

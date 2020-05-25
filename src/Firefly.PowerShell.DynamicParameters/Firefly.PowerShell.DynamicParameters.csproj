@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net40;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net40;netcoreapp2.1;netcoreapp3.1;netstandard2.1</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>This library facilitates the creation of dynamic parameters for PowerShell cmdlets written in .NET</Description>
     <Copyright>Copyright (c) 2020 Firefly Consulting Ltd.</Copyright>
@@ -13,23 +13,23 @@
     <PackageTags>PowerShell;Cmdlet;Dynamic;Parameters</PackageTags>
     <Authors>Alistair Mackay</Authors>
     <Company>Firefly IT Consulting</Company>
-    <Version>0.1.0</Version>
+    <Version>0.0.1</Version>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+    <FileVersion>0.0.1.0</FileVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
     <PackageReference Include="Microsoft.PowerShell.5.ReferenceAssemblies" Version="1.1.0" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
     <PackageReference Include="System.Management.Automation" Version="6.1.6" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <PackageReference Include="System.Management.Automation" Version="7.0.0" />
   </ItemGroup>
-
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.0" />
+  </ItemGroup>
 </Project>
