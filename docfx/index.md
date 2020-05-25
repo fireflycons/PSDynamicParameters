@@ -17,6 +17,7 @@ This library handles the second case above. By implementing a builder pattern to
 The nuget package contains the following builds
 
 * .NET 4.0 - Windows PowerShell 5.1
-* NETCORE 2.1 - PowerShell Core 6
-* NETCORE 3.1 - PowerShell Core 7
+* NETSTANDARD 2.1 - Windows PowerShell 5.1, PowerShell Core 6, PowerShell Core 7
+* NETCORE 2.1 - PowerShell Core 6 (Includes additional APIs)
+* NETCORE 3.1 - PowerShell Core 7 (Includes additional APIs)
 
