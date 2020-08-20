@@ -2,6 +2,8 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/a7wi3yhl92wii80u/branch/master?svg=true)](https://ci.appveyor.com/project/fireflycons/psdynamicparameters/branch/master)
 
+![Nuget](https://img.shields.io/nuget/v/Firefly.PowerShell.DynamicParameters)
+
 A library for the creation of runtime [dynamic parameters](https://docs.microsoft.com/en-gb/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters) for binary cmdlets.
 
 When creating a binary cmdlet, there are two ways that you can declare dynamic parameters:
