@@ -18,8 +18,9 @@ This library handles the second case above. By implementing a builder pattern to
 The nuget package contains the following builds
 
 * .NET Framework 4.0 - Windows PowerShell 5.1
-* .NET Core 2.1 - PowerShell Core 6 (Windows/Linux/MacOS)
-* .NET Core 3.1 - PowerShell Core 7 (Windows/Linux/MacOS)
+* .NET Core 2.1 - PowerShell Core 6 (Windows/Linux/MacOS) - With PS 6 features.
+* .NET Core 3.1 - PowerShell Core 7 (Windows/Linux/MacOS) - With PS 7 Features
+* .NET Standard 2.0 - Powershell >= 5.1 (Cross Platform) - PS 5.1 features
 
 Tests are run on all three platforms for both PowerShell Core versions.
 
