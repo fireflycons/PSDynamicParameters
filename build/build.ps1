@@ -123,14 +123,14 @@ try
     if ($Experimental.IsPresent)
     {
         Write-Verbose -Message "Using experimental version of Roslyn."
-        $UseExperimental = "-experimental"
+        $UseExperimental = "--experimental"
     }
 
     # Is this a dry run?
     $UseDryRun = [string]::Empty;
     if ($WhatIf.IsPresent)
     {
-        $UseDryRun = "-dryrun"
+        $UseDryRun = "--dryrun"
     }
 
     # Will we use dotnet to invoke Cake?
@@ -238,7 +238,7 @@ try
                 ($md5Hash -ne (Get-Content $PACKAGES_CONFIG_MD5 )))
             {
                 Write-Verbose -Message "Missing or changed package.config hash..."
-                Remove-Item * -Recurse -Exclude packages.config, nuget.exe
+                Remove-Item * -Recurse -Force -Exclude packages.config, nuget.exe
             }
 
             Write-Verbose -Message "Restoring tools from NuGet..."
@@ -376,7 +376,7 @@ try
         Invoke-Expression "& $DotNetExpression `"$CAKE`"  `"$scriptToExecute`" --bootstrap"
 
         # Now execute script
-        Invoke-Expression "& $DotNetExpression `"$CAKE`" `"$scriptToExecute`" -target=`"$Target`" -configuration=`"$Configuration`" -verbosity=`"$Verbosity`" $UseMono $UseDryRun $UseExperimental $ScriptArgs"
+        Invoke-Expression "& $DotNetExpression `"$CAKE`" `"$scriptToExecute`" --target=`"$Target`" --configuration=`"$Configuration`" --verbosity=`"$Verbosity`" $UseMono $UseDryRun $UseExperimental $ScriptArgs"
 
         if ($LASTEXITCODE -ne 0)
         {

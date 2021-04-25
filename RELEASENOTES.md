@@ -1,3 +1,7 @@
+# v0.2.2
+
+* Enhancement - Add SourceLink support. [Issue link](https://github.com/fireflycons/PSDynamicParameters/issues/2)
+
 # v0.2.1
 
 * Add netstandard2.0 target. Seems more compatible with Windows PowerShell. Should have thought of this first ;-)

@@ -1,5 +1,5 @@
 #addin nuget:?package=Newtonsoft.Json&version=12.0.3
-#addin nuget:?package=Cake.Http&version=0.7.0
+#addin nuget:?package=Cake.Http&version=1.2.2
 
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,7 +41,7 @@ Task("Init")
 
         buildVersion = GetBuildVersion();
 
-        foreach(var projectFile in GetFiles(projectRoot + File("**/*.csproj")))
+        foreach(var projectFile in GetFiles(new GlobPattern(projectRoot + File("**/*.csproj"))))
         {
             var project = XElement.Load(projectFile.ToString());
 
@@ -122,7 +122,7 @@ Task("TestOnWindows")
             {
                 Configuration = configuration,
                 NoBuild = true,
-                Logger = "trx",
+                Loggers = new [] { "trx" },
                 ResultsDirectory = testResultsDir
             });
         }
@@ -147,7 +147,7 @@ Task("TestOnLinux")
                     Configuration = configuration,
                     NoBuild = true,
                     Framework = framework,
-                    Logger = "trx",
+                    Loggers = new [] { "trx" },
                     ResultsDirectory = testResultsDir
                 });
             }
@@ -251,15 +251,29 @@ Task("PushAppveyor")
     });
 
 Task("PushNuget")
-    .WithCriteria(isAppveyor)
-    .WithCriteria(isReleasePublication)
-    .WithCriteria(IsRunningOnWindows())
+    .WithCriteria(isAppveyor && isReleasePublication && IsRunningOnWindows())
     .Does(() => {
 
-        NuGetPush(nugetPackagePath, new NuGetPushSettings {
-                Source = "https://api.nuget.org/v3/index.json",
-                ApiKey = EnvironmentVariable("NUGET_API_KEY")
-            });
+        var package = nugetPackagePath.GetFilename();
+        var workingDirectory = nugetPackagePath.GetDirectory();
+
+        var oldcwd = Context.Environment.WorkingDirectory;
+
+        try
+        {
+            Context.Environment.WorkingDirectory = workingDirectory;
+
+            NuGetPush(nugetPackagePath, new NuGetPushSettings {
+                    Source = "https://api.nuget.org/v3/index.json",
+                    ApiKey = EnvironmentVariable("NUGET_API_KEY"),
+                    WorkingDirectory = workingDirectory,
+                    Verbosity = NuGetVerbosity.Detailed
+                });
+        }
+        finally
+        {
+            Context.Environment.WorkingDirectory = oldcwd;
+        }
     });
 
 Task("Build")
@@ -416,7 +430,7 @@ void UploadTestResults()
 
     using (var wc = new WebClient())
     {
-        foreach(var result in GetFiles(testResultsDir + File("*.trx")))
+        foreach(var result in GetFiles(new GlobPattern(testResultsDir + File("*.trx"))))
         {
             wc.UploadFile($"https://ci.appveyor.com/api/testresults/mstest/{EnvironmentVariableStrict("APPVEYOR_JOB_ID")}", result.ToString());
         }
