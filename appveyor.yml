@@ -1,6 +1,6 @@
 environment:
   NUGET_API_KEY:
-    secure: 5/QzeZBngyyV1TI/Kv5UP04yXIlI1MSnaYBJnu+oxO1m8+VMMfgrFf+YfOpqYfzY
+    secure: zq0+IBIITvBHIsVd7MmRQl09X2q4erMzK7LBi2UTpjNFgJeY/R+Krm4dZWAcb4E1
   GITHUB_PAT:
     secure: w8H/kYnxC0NVBLhm4uXSLNH110FtIAQ1COq0Wl5RgwDCG3apzXfSCEfJcwSc44QQ
   GITHUB_EMAIL:
